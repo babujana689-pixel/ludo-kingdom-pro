@@ -568,3 +568,55 @@ input[type="text"], select {
   color: var(--gold-light);
   font-weight: 600;
 }
+/* Quick Mode সিলেক্ট হলে উজ্জ্বল গোল্ডেন গ্লো ও পপ অ্যানিমেশন */
+.quick-mode-card {
+  transition: transform 0.18s ease, box-shadow 0.22s ease, border-color 0.22s ease, background 0.22s ease;
+}
+
+.quick-mode-card:active {
+  transform: scale(0.96);
+}
+
+.quick-mode-card.selected-preset {
+  border-color: #facc15 !important;
+  background: linear-gradient(145deg, rgba(250, 204, 21, 0.26), rgba(30, 58, 138, 0.55)) !important;
+  box-shadow: 0 0 18px rgba(250, 204, 21, 0.55), inset 0 0 10px rgba(254, 240, 138, 0.3) !important;
+  transform: translateY(-2px) scale(1.02);
+  animation: royalPulse 1.4s infinite alternate;
+}
+
+/* Human / AI / OFF পিল সিলেক্ট হলে উজ্জ্বল আলো ও অ্যানিমেশন */
+.role-pill {
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.role-pill:active {
+  transform: scale(0.92);
+}
+
+.role-pill.active {
+  background: linear-gradient(135deg, #facc15, #f59e0b) !important;
+  color: #070b19 !important;
+  font-weight: 700 !important;
+  box-shadow: 0 0 14px rgba(250, 204, 21, 0.75) !important;
+  transform: scale(1.06);
+}
+
+/* START GAME বাটনে হালকা শাইন অ্যানিমেশন */
+.golden-start-btn {
+  transition: transform 0.16s ease, box-shadow 0.22s ease;
+  box-shadow: 0 4px 20px rgba(245, 158, 11, 0.45);
+}
+
+.golden-start-btn:active {
+  transform: scale(0.97);
+}
+
+@keyframes royalPulse {
+  from {
+    box-shadow: 0 0 12px rgba(250, 204, 21, 0.4);
+  }
+  to {
+    box-shadow: 0 0 22px rgba(250, 204, 21, 0.8);
+  }
+}
