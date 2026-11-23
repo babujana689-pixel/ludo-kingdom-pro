@@ -1,10 +1,11 @@
-// Authentication & Player Profile Manager for Ludo Kingdom Pro
-import { auth, db, googleProvider, facebookProvider } from "./firebase-config.js";
+import { auth, db } from "./firebase-config.js";
 import {
+  GoogleAuthProvider,
+  FacebookAuthProvider,
   signInWithPopup,
   signInAnonymously,
-  onAuthStateChanged,
-  signOut
+  signOut,
+  onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
   ref,
@@ -13,69 +14,69 @@ import {
   update
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-// ডিফল্ট ইউজার প্রোফাইল তৈরি বা লোড করার ফাংশন
+const googleProvider = new GoogleAuthProvider();
+const facebookProvider = new FacebookAuthProvider();
+
 async function ensurePlayerProfile(user) {
   const userRef = ref(db, `users/${user.uid}`);
-  const snapshot = await get(userRef);
+  const snap = await get(userRef);
 
-  const defaultName = user.displayName || `Player_${user.uid.slice(0, 5)}`;
-  const defaultAvatar = user.photoURL || "";
-
-  if (!snapshot.exists()) {
+  if (!snap.exists()) {
     const newProfile = {
       uid: user.uid,
-      name: defaultName,
-      avatar: defaultAvatar,
-      isGuest: user.isAnonymous,
+      name: user.displayName || `Royal_${user.uid.slice(0, 5)}`,
+      avatar: user.photoURL || "",
       coins: 1000,
-      wins: 0,
-      matches: 0,
+      gems: 25,
       level: 1,
-      createdAt: Date.now(),
-      lastLogin: Date.now()
+      wins: 0,
+      isGuest: user.isAnonymous || false,
+      createdAt: Date.now()
     };
     await set(userRef, newProfile);
     return newProfile;
   } else {
-    const existing = snapshot.val();
-    await update(userRef, {
-      lastLogin: Date.now(),
-      name: user.displayName || existing.name,
-      avatar: user.photoURL || existing.avatar
-    });
-    return { ...existing, name: user.displayName || existing.name };
+    const existing = snap.val();
+    await update(userRef, { lastLogin: Date.now() });
+    return existing;
   }
 }
 
-// Google দিয়ে লগইন
 export async function loginWithGoogle() {
-  const result = await signInWithPopup(auth, googleProvider);
-  return await ensurePlayerProfile(result.user);
+  const res = await signInWithPopup(auth, googleProvider);
+  return await ensurePlayerProfile(res.user);
 }
 
-// Facebook দিয়ে লগইন
 export async function loginWithFacebook() {
-  const result = await signInWithPopup(auth, facebookProvider);
-  return await ensurePlayerProfile(result.user);
+  const res = await signInWithPopup(auth, facebookProvider);
+  return await ensurePlayerProfile(res.user);
 }
 
-// Guest (Anonymous) হিসেবে খেলা
 export async function loginAsGuest() {
-  const result = await signInAnonymously(auth);
-  return await ensurePlayerProfile(result.user);
+  const res = await signInAnonymously(auth);
+  return await ensurePlayerProfile(res.user);
 }
 
-// লগআউট
 export async function logoutPlayer() {
   await signOut(auth);
 }
 
-// লগইন অবস্থা পর্যবেক্ষণ
 export function watchAuthState(callback) {
   onAuthStateChanged(auth, async (user) => {
     if (user) {
-      const profile = await ensurePlayerProfile(user);
-      callback(user, profile);
+      try {
+        const profile = await ensurePlayerProfile(user);
+        callback(user, profile);
+      } catch (e) {
+        console.error("Profile sync error:", e);
+        callback(user, {
+          uid: user.uid,
+          name: user.displayName || "Royal Player",
+          coins: 1000,
+          level: 1,
+          isGuest: user.isAnonymous
+        });
+      }
     } else {
       callback(null, null);
     }
