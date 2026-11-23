@@ -765,4 +765,7 @@
     renderer.render(scene, camera);
   }
   animate();
+  const playerProfile = getActivePlayerProfile();
+const profileBannerHtml = renderOnlineProfileBanner(playerProfile);
+
 })();
