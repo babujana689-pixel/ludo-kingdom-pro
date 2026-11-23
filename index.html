@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Ludo Kingdom Pro — Royal Ludo</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/platform-ui.css" />
+  <script src="js/three.min.js"></script>
+  <script>
+    if (typeof THREE === "undefined") {
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>');
+    }
+  </script>
+  <style>
+    :root {
+      --navy-deep: #070b19;
+      --navy-card: #0e162e;
+      --navy-elevated: #142042;
+      --gold-primary: #facc15;
+      --gold-rich: #d4af37;
+      --gold-amber: #f59e0b;
+      --gold-border: rgba(250, 204, 21, 0.42);
+      --text-clean: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    body {
+      background: var(--navy-deep);
+      color: var(--text-clean);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    /* Royal Login Screen Overlay */
+    .auth-gate-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      background: radial-gradient(circle at top, rgba(20, 32, 66, 0.96), rgba(5, 8, 20, 0.99));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      pointer-events: auto;
+    }
+    .auth-gate-overlay.hidden {
+      display: none !important;
+    }
+    .auth-card {
+      width: 100%;
+      max-width: 390px;
+      background: linear-gradient(165deg, #111d3e 0%, #080d20 100%);
+      border: 1.5px solid var(--gold-rich);
+      border-radius: 24px;
+      padding: 24px 20px;
+      text-align: center;
+      box-shadow: 0 22px 50px rgba(0, 0, 0, 0.85), 0 0 30px rgba(212, 175, 55, 0.25);
+      position: relative;
+      z-index: 100000;
+    }
+    .auth-crown {
+      font-size: 2.6rem;
+      margin-bottom: 6px;
+      filter: drop-shadow(0 0 12px rgba(250, 204, 21, 0.5));
+    }
+    .auth-title {
+      font-size: 1.45rem;
+      font-weight: 900;
+      color: var(--gold-primary);
+      letter-spacing: 0.6px;
+      margin: 0 0 4px;
+    }
+    .auth-sub {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin: 0 0 18px;
+    }
+    .auth-btn {
+      width: 100%;
+      padding: 13px 16px;
+      border-radius: 14px;
+      font-weight: 800;
+      font-size: 0.92rem;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      touch-action: manipulation;
+      transition: transform 0.15s ease, opacity 0.2s ease;
+    }
+    .auth-btn:active {
+      transform: scale(0.96);
+    }
+    .auth-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .btn-google {
+      background: #ffffff;
+      color: #0f172a;
+      box-shadow: 0 6px 18px rgba(255, 255, 255, 0.16);
+    }
+    .btn-facebook {
+      background: #1877f2;
+      color: #ffffff;
+      box-shadow: 0 6px 18px rgba(24, 119, 242, 0.35);
+    }
+    .btn-guest {
+      background: linear-gradient(135deg, #facc15, #d97706);
+      color: #070b19;
+      border: 1px solid #fef08a;
+      box-shadow: 0 6px 18px rgba(245, 158, 11, 0.35);
+    }
+    .auth-skip-btn {
+      margin-top: 8px;
+      padding: 8px 12px;
+      background: transparent;
+      border: none;
+      color: #cbd5e1;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-decoration: underline;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .auth-status-msg {
+      margin-top: 10px;
+      font-size: 0.78rem;
+      color: #facc15;
+      min-height: 20px;
+      word-break: break-word;
+    }
+    .avatar-ring img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    /* Premium Modal Card Styling */
+    .modal-overlay {
+      background: rgba(4, 7, 18, 0.84);
+      backdrop-filter: blur(10px);
+      padding: 12px;
+      z-index: 9000;
+    }
+    .modal-card {
+      background: linear-gradient(165deg, #101b39 0%, #090f24 100%) !important;
+      border: 1.5px solid var(--gold-rich) !important;
+      border-radius: 20px !important;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.75), 0 0 24px rgba(212, 175, 55, 0.25) !important;
+      max-width: 420px;
+      width: 100%;
+      padding: 16px !important;
+      max-height: 88vh;
+      overflow-y: auto;
+    }
+    .modal-header {
+      border-bottom: 1px solid rgba(250, 204, 21, 0.25);
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+    }
+    .modal-header h2 {
+      color: var(--gold-primary) !important;
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+    }
+    .modal-close {
+      background: rgba(250, 204, 21, 0.14) !important;
+      border: 1px solid var(--gold-border) !important;
+      color: var(--gold-primary) !important;
+      border-radius: 10px;
+      width: 32px;
+      height: 32px;
+    }
+
+    .royal-section-title {
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--gold-primary);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .quick-modes-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .quick-mode-card {
+      background: linear-gradient(145deg, #132044, #0c142c);
+      border: 1px solid rgba(250, 204, 21, 0.35);
+      border-radius: 14px;
+      padding: 12px 8px;
+      color: #f8fafc;
+      font-weight: 700;
+      font-size: 0.82rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+    .quick-mode-card:active {
+      transform: scale(0.96);
+    }
+    .slot-list {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-bottom: 14px;
+    }
+    .slot-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(11, 18, 38, 0.9);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      border-radius: 13px;
+      padding: 8px 11px;
+    }
+    .slot-color-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+    .slot-dot {
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      box-shadow: 0 0 8px currentColor;
+    }
+    .role-switch-group {
+      display: flex;
+      gap: 5px;
+      background: #070c1c;
+      padding: 3px;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+    .role-pill {
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 0.74rem;
+      font-weight: 800;
+      border: none;
+      background: transparent;
+      color: #94a3b8;
+      cursor: pointer;
+    }
+    .role-pill.active {
+      background: linear-gradient(135deg, #facc15, #d97706);
+      color: #070b19;
+    }
+    .golden-start-btn {
+      width: 100%;
+      padding: 13px 16px;
+      border-radius: 15px;
+      border: 1.5px solid #fef08a;
+      background: linear-gradient(135deg, #fde047 0%, #f59e0b 55%, #d97706 100%);
+      color: #070b19;
+      font-weight: 900;
+      font-size: 0.94rem;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      box-shadow: 0 8px 22px rgba(245, 158, 11, 0.45);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .royal-input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1.5px solid rgba(250, 204, 21, 0.45);
+      background: #070c1c;
+      color: #facc15;
+      font-size: 1.05rem;
+      font-weight: 900;
+      letter-spacing: 3px;
+      text-align: center;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+    }
+    .room-code-banner {
+      background: rgba(250, 204, 21, 0.12);
+      border: 1.5px dashed #facc15;
+      border-radius: 14px;
+      padding: 12px;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .audio-setting-card {
+      background: rgba(11, 18, 38, 0.92);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+    .audio-row-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-weight: 800;
+      font-size: 0.88rem;
+      color: #f8fafc;
+    }
+    .toggle-pill-btn {
+      padding: 5px 14px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 0.76rem;
+      border: 1px solid var(--gold-rich);
+      cursor: pointer;
+    }
+    .toggle-pill-btn.on {
+      background: linear-gradient(135deg, #facc15, #d97706);
+      color: #070b19;
+    }
+    .toggle-pill-btn.off {
+      background: #1e293b;
+      color: #94a3b8;
+      border-color: #475569;
+    }
+    .royal-slider {
+      width: 100%;
+      accent-color: #facc15;
+      height: 6px;
+      cursor: pointer;
+    }
+
+    #game-hud {
+      pointer-events: none;
+      justify-content: space-between;
+    }
+    .hud-top {
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      z-index: 20;
+    }
+    .corner-pods-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 15;
+    }
+    .corner-pod {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 14px;
+      background: rgba(11, 16, 33, 0.9);
+      border: 1.5px solid rgba(212, 175, 55, 0.35);
+      backdrop-filter: blur(8px);
+      transition: all 0.25s ease;
+      pointer-events: auto;
+      cursor: pointer;
+      user-select: none;
+    }
+    .corner-pod.inactive-slot {
+      opacity: 0.25;
+      pointer-events: none;
+    }
+    .corner-pod.active-turn {
+      border-color: #facc15;
+      box-shadow: 0 0 18px rgba(250, 204, 21, 0.7), inset 0 0 10px rgba(250, 204, 21, 0.25);
+      transform: scale(1.04);
+    }
+    .pod-label {
+      font-weight: 800;
+      font-size: 0.84rem;
+      letter-spacing: 0.4px;
+      white-space: nowrap;
+    }
+    .pod-sub {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: #cbd5e1;
+      display: block;
+    }
+    .pod-dice-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      position: relative;
+    }
+    .corner-pod.active-turn .pod-dice-box {
+      border-color: #fde047;
+      box-shadow: 0 0 12px rgba(250, 204, 21, 0.55);
+    }
+    .pod-red    { color: #ff5a5f; }
+    .pod-green  { color: #4ade80; }
+    .pod-yellow { color: #facc15; }
+    .pod-blue   { color: #38bdf8; }
+
+    .legacy-hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <!-- ROYAL LOGIN SCREEN OVERLAY -->
+  <div id="auth-gate-overlay" class="auth-gate-overlay">
+    <div class="auth-card">
+      <div class="auth-crown">👑</div>
+      <h2 class="auth-title">LUDO KINGDOM PRO</h2>
+      <p class="auth-sub">Sign in to save coins, rank & play online</p>
+
+      <button type="button" class="auth-btn btn-google" id="btn-login-google">
+        <span>🔴</span> Continue with Google
+      </button>
+
+      <button type="button" class="auth-btn btn-facebook" id="btn-login-facebook">
+        <span>🔵</span> Continue with Facebook
+      </button>
+
+      <button type="button" class="auth-btn btn-guest" id="btn-login-guest">
+        <span>🎲</span> Play as Guest (Instant)
+      </button>
+
+      <button type="button" class="auth-skip-btn" id="btn-skip-login">
+        Play Offline Without Account
+      </button>
+
+      <div class="auth-status-msg" id="auth-status-msg"></div>
+    </div>
+  </div>
+
+  <!-- 3D Canvas Background, Board & 4 Corner Glossy 3D Dice -->
+  <canvas id="game-canvas"></canvas>
+
+  <!-- HOME LOBBY SCREEN -->
+  <div id="home-screen" class="screen active">
+    <header class="top-bar">
+      <div class="profile-pill" id="btn-profile">
+        <div class="avatar-ring" id="player-avatar-box">👑</div>
+        <div class="profile-info">
+          <span class="player-name" id="display-name">Royal Guest</span>
+          <span class="player-level" id="player-level-badge">Lvl 1 • Novice</span>
+        </div>
+      </div>
+
+      <div class="currency-group">
+        <div class="currency-pill">
+          <span class="coin-icon">🟡</span>
+          <span id="coin-balance">1,000</span>
+        </div>
+        <div class="currency-pill">
+          <span class="gem-icon">💎</span>
+          <span id="gem-balance">25</span>
+        </div>
+        <button class="icon-btn" id="btn-settings" aria-label="Music & Sound Settings">⚙️</button>
+      </div>
+    </header>
+
+    <aside class="side-dock">
+      <button class="dock-item" id="btn-daily">
+        <span class="dock-badge"></span>
+        <span class="dock-icon">🎁</span>
+        <span class="dock-label">Daily</span>
+      </button>
+      <button class="dock-item" id="btn-quests">
+        <span class="dock-icon">⚔️</span>
+        <span class="dock-label">Quests</span>
+      </button>
+      <button class="dock-item" id="btn-friends">
+        <span class="dock-icon">👥</span>
+        <span class="dock-label">Friends</span>
+      </button>
+      <button class="dock-item" id="btn-alerts">
+        <span class="dock-icon">🔔</span>
+        <span class="dock-label">Alerts</span>
+      </button>
+    </aside>
+
+    <main class="hero-center">
+      <div class="royal-badge">★ ROYAL EDITION ★</div>
+      <h1 class="game-title">
+        <span class="title-main">LUDO KINGDOM</span>
+        <span class="title-3d">PRO</span>
+      </h1>
+      <p class="game-subtitle">Roll the Crown • Rule the Board</p>
+    </main>
+
+    <section class="bottom-controls">
+      <button class="btn-primary-hero" id="btn-play-offline">
+        <span class="btn-hero-icon">🎲</span>
+        <div class="btn-hero-text">
+          <span class="btn-hero-title">PLAY OFFLINE & AI</span>
+          <span class="btn-hero-sub">Pass & Play • Smart AI</span>
+        </div>
+      </button>
+
+      <div class="mode-grid">
+        <button class="mode-card" id="btn-play-online">
+          <span class="mode-icon">🌐</span>
+          <span class="mode-title">Online Match</span>
+          <span class="mode-tag">2P / 4P Live</span>
+        </button>
+
+        <button class="mode-card" id="btn-private-room">
+          <span class="mode-icon">🏰</span>
+          <span class="mode-title">Private Room</span>
+          <span class="mode-tag">Voice + Code</span>
+        </button>
+      </div>
+
+      <nav class="bottom-nav">
+        <button class="nav-btn" id="btn-leaderboard">🏆<span>Ranks</span></button>
+        <button class="nav-btn" id="btn-skins">🎨<span>Skins</span></button>
+        <button class="nav-btn" id="btn-vip">👑<span>VIP Pass</span></button>
+        <button class="nav-btn" id="btn-history">📜<span>History</span></button>
+      </nav>
+    </section>
+  </div>
+
+  <!-- IN-GAME 3D BOARD HUD -->
+  <div id="game-hud" class="screen">
+    <div class="hud-top">
+      <button class="hud-pill-btn" id="btn-exit-match">← Lobby</button>
+      <div class="match-info-badge" id="match-mode-label">Ludo Kingdom Pro</div>
+      <div style="display:flex;gap:6px;">
+        <button class="hud-pill-btn" id="btn-ingame-audio" aria-label="Audio Settings">🔊</button>
+        <button class="hud-pill-btn" id="btn-reset-cam">🎥</button>
+      </div>
+    </div>
+
+    <div class="corner-pods-layer" id="corner-pods-layer">
+      <div class="corner-pod" id="hud-green" data-dice-color="green">
+        <div class="pod-dice-box" id="dice-slot-green"></div>
+        <div>
+          <span class="pod-label pod-green" id="name-green">🟢 GREEN</span>
+          <span class="pod-sub" id="score-green">0/4</span>
+        </div>
+      </div>
+
+      <div class="corner-pod" id="hud-yellow" data-dice-color="yellow">
+        <div style="text-align:right;">
+          <span class="pod-label pod-yellow" id="name-yellow">🟡 YELLOW</span>
+          <span class="pod-sub" id="score-yellow">0/4</span>
+        </div>
+        <div class="pod-dice-box" id="dice-slot-yellow"></div>
+      </div>
+
+      <div class="corner-pod" id="hud-red" data-dice-color="red">
+        <div class="pod-dice-box" id="dice-slot-red"></div>
+        <div>
+          <span class="pod-label pod-red" id="name-red">🔴 RED</span>
+          <span class="pod-sub" id="score-red">0/4</span>
+        </div>
+      </div>
+
+      <div class="corner-pod" id="hud-blue" data-dice-color="blue">
+        <div style="text-align:right;">
+          <span class="pod-label pod-blue" id="name-blue">🔵 BLUE</span>
+          <span class="pod-sub" id="score-blue">0/4</span>
+        </div>
+        <div class="pod-dice-box" id="dice-slot-blue"></div>
+      </div>
+    </div>
+
+    <div class="legacy-hidden">
+      <div id="turn-status-text"></div>
+      <button id="btn-roll-dice"><span id="dice-face-icon"></span><span id="dice-value-label"></span></button>
+    </div>
+  </div>
+
+  <!-- MODAL OVERLAY -->
+  <div id="modal-overlay" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="modal-title">Modal Title</h2>
+        <button class="modal-close" id="btn-close-modal">✕</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- Existing Offline Engine & Board Scripts (Untouched) -->
+  <script src="js/sound-fx.js"></script>
+  <script src="js/board3d.js"></script>
+  <script src="js/ludo-engine.js"></script>
+  <script src="js/main.js"></script>
+
+  <!-- Immediate Fallback Click Handler -->
+  <script>
+    window.royalAuthActions = {
+      google: null,
+      facebook: null,
+      guest: null,
+      logout: null
+    };
+
+    (function () {
+      const authOverlay = document.getElementById("auth-gate-overlay");
+      const statusMsg = document.getElementById("auth-status-msg");
+
+      document.getElementById("btn-skip-login").addEventListener("click", function () {
+        authOverlay.classList.add("hidden");
+      });
+
+      document.getElementById("btn-login-google").addEventListener("click", function () {
+        if (window.royalAuthActions.google) {
+          window.royalAuthActions.google();
+        } else {
+          statusMsg.textContent = "Loading Firebase... Test on Chrome/GitHub Pages for popup login.";
+        }
+      });
+
+      document.getElementById("btn-login-facebook").addEventListener("click", function () {
+        if (window.royalAuthActions.facebook) {
+          window.royalAuthActions.facebook();
+        } else {
+          statusMsg.textContent = "Loading Firebase... Test on Chrome/GitHub Pages for popup login.";
+        }
+      });
+
+      document.getElementById("btn-login-guest").addEventListener("click", function () {
+        if (window.royalAuthActions.guest) {
+          window.royalAuthActions.guest();
+        } else {
+          statusMsg.textContent = "Loading Firebase... Please wait a second.";
+        }
+      });
+    })();
+  </script>
+
+  <!-- Firebase Auth, Profile, Random Matchmaking & Private Room UI Bridge -->
+  <script type="module">
+    import {
+      loginWithGoogle,
+      loginWithFacebook,
+      loginAsGuest,
+      logoutPlayer,
+      watchAuthState
+    } from "./js/auth-profile.js";
+
+    import {
+      createPrivateRoom,
+      joinPrivateRoom,
+      findOnlineMatch,
+      subscribeToRoom,
+      startOnlineRoomMatch,
+      leaveOnlineRoom
+    } from "./js/online-room.js";
+
+    const authOverlay = document.getElementById("auth-gate-overlay");
+    const statusMsg = document.getElementById("auth-status-msg");
+    const btnGoogle = document.getElementById("btn-login-google");
+    const btnFacebook = document.getElementById("btn-login-facebook");
+   
