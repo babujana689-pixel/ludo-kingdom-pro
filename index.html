@@ -12,7 +12,6 @@
       document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>');
     }
   </script>
-  <!-- Fast Classic Firebase SDKs (100% Reliable on Mobile Chrome) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
@@ -257,21 +256,21 @@
       <h2 class="auth-title">LUDO KINGDOM PRO</h2>
       <p class="auth-sub">Sign in to save coins, rank & play online</p>
 
-      <button type="button" id="act-google" class="auth-btn btn-google">
+      <div role="button" tabindex="0" id="act-google" class="auth-btn btn-google" ontouchstart="window._tapAuth('google')" onclick="window._tapAuth('google')">
         <span>🔴</span> Continue with Google
-      </button>
+      </div>
 
-      <button type="button" id="act-facebook" class="auth-btn btn-facebook">
+      <div role="button" tabindex="0" id="act-facebook" class="auth-btn btn-facebook" ontouchstart="window._tapAuth('facebook')" onclick="window._tapAuth('facebook')">
         <span>🔵</span> Continue with Facebook
-      </button>
+      </div>
 
-      <button type="button" id="act-guest" class="auth-btn btn-guest">
+      <div role="button" tabindex="0" id="act-guest" class="auth-btn btn-guest" ontouchstart="window._tapAuth('guest')" onclick="window._tapAuth('guest')">
         <span>🎲</span> Play as Guest (Instant)
-      </button>
+      </div>
 
-      <button type="button" id="act-skip" class="auth-skip-btn">
+      <div role="button" tabindex="0" id="act-skip" class="auth-skip-btn" ontouchstart="window._tapAuth('skip')" onclick="window._tapAuth('skip')">
         Play Offline Without Account
-      </button>
+      </div>
 
       <div class="auth-status-msg" id="auth-status-msg">● Server Ready</div>
     </div>
@@ -407,14 +406,6 @@
       const modalTitle = document.getElementById("modal-title");
       const modalBody = document.getElementById("modal-body");
 
-      if (typeof firebase === "undefined") {
-        if (statusMsg) {
-          statusMsg.style.color = "#fca5a5";
-          statusMsg.textContent = "Network slow: Firebase SDK failed to load. Check internet & refresh.";
-        }
-        return;
-      }
-
       const firebaseConfig = {
         apiKey: "AIzaSyB-LX_SEe3SXMjF3C-AjTu7NHLHYWmsIF4",
         authDomain: "ludo-kingdom-pro.firebaseapp.com",
@@ -515,7 +506,12 @@
         }
       });
 
-      async function handleRoyalLogin(type) {
+      let lastTap = 0;
+      window._tapAuth = async function(type) {
+        const now = Date.now();
+        if (now - lastTap < 450) return;
+        lastTap = now;
+
         if (type === "skip") {
           authOverlay.classList.add("hidden");
           return;
@@ -531,7 +527,4 @@
           } else {
             const provider = type === "google"
               ? new firebase.auth.GoogleAuthProvider()
-              : new firebase.auth.FacebookAuthProvider();
-            try {
-              const res = await auth.signInWithPopup(provider);
-              const profile = await ensur
+              : new firebase.auth.FacebookAuthProvide
