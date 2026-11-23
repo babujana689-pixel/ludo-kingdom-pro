@@ -3,6 +3,8 @@ import {
   GoogleAuthProvider,
   FacebookAuthProvider,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   signInAnonymously,
   signOut,
   onAuthStateChanged
@@ -43,13 +45,29 @@ async function ensurePlayerProfile(user) {
 }
 
 export async function loginWithGoogle() {
-  const res = await signInWithPopup(auth, googleProvider);
-  return await ensurePlayerProfile(res.user);
+  try {
+    const res = await signInWithPopup(auth, googleProvider);
+    return await ensurePlayerProfile(res.user);
+  } catch (err) {
+    if (err?.code === "auth/popup-blocked" || err?.code === "auth/operation-not-supported-in-this-environment") {
+      await signInWithRedirect(auth, googleProvider);
+      return null;
+    }
+    throw err;
+  }
 }
 
 export async function loginWithFacebook() {
-  const res = await signInWithPopup(auth, facebookProvider);
-  return await ensurePlayerProfile(res.user);
+  try {
+    const res = await signInWithPopup(auth, facebookProvider);
+    return await ensurePlayerProfile(res.user);
+  } catch (err) {
+    if (err?.code === "auth/popup-blocked" || err?.code === "auth/operation-not-supported-in-this-environment") {
+      await signInWithRedirect(auth, facebookProvider);
+      return null;
+    }
+    throw err;
+  }
 }
 
 export async function loginAsGuest() {
@@ -62,6 +80,8 @@ export async function logoutPlayer() {
 }
 
 export function watchAuthState(callback) {
+  getRedirectResult(auth).catch((e) => console.error("Redirect auth error:", e));
+
   onAuthStateChanged(auth, async (user) => {
     if (user) {
       try {
