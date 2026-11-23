@@ -31,13 +31,14 @@
     #auth-gate-overlay,
     #auth-gate-overlay * {
       pointer-events: auto !important;
+      touch-action: manipulation !important;
     }
 
     .auth-gate-overlay {
       position: fixed;
       inset: 0;
-      z-index: 999999;
-      background: radial-gradient(circle at top, rgba(20, 32, 66, 0.96), rgba(5, 8, 20, 0.99));
+      z-index: 2147483647;
+      background: radial-gradient(circle at top, rgba(20, 32, 66, 0.97), rgba(5, 8, 20, 0.99));
       display: flex;
       align-items: center;
       justify-content: center;
@@ -72,7 +73,6 @@
       justify-content: center;
       gap: 10px;
       margin-bottom: 11px;
-      touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
     }
     .auth-btn:active { transform: scale(0.96); }
@@ -92,7 +92,8 @@
     }
     .auth-status-msg {
       margin-top: 10px;
-      font-size: 0.8rem;
+      font-size: 0.82rem;
+      font-weight: 700;
       color: #facc15;
       min-height: 22px;
       word-break: break-word;
@@ -252,19 +253,19 @@
       <h2 class="auth-title">LUDO KINGDOM PRO</h2>
       <p class="auth-sub">Sign in to save coins, rank & play online</p>
 
-      <button type="button" class="auth-btn btn-google" onclick="window.royalLoginAction('google')">
+      <button type="button" id="act-google" class="auth-btn btn-google">
         <span>🔴</span> Continue with Google
       </button>
 
-      <button type="button" class="auth-btn btn-facebook" onclick="window.royalLoginAction('facebook')">
+      <button type="button" id="act-facebook" class="auth-btn btn-facebook">
         <span>🔵</span> Continue with Facebook
       </button>
 
-      <button type="button" class="auth-btn btn-guest" onclick="window.royalLoginAction('guest')">
+      <button type="button" id="act-guest" class="auth-btn btn-guest">
         <span>🎲</span> Play as Guest (Instant)
       </button>
 
-      <button type="button" class="auth-skip-btn" onclick="document.getElementById('auth-gate-overlay').classList.add('hidden')">
+      <button type="button" id="act-skip" class="auth-skip-btn">
         Play Offline Without Account
       </button>
 
@@ -387,20 +388,47 @@
 
   <div id="toast" class="toast hidden"></div>
 
-  <!-- Immediate Global Click Handler (Works even before module finishes loading) -->
+  <!-- Capture-Phase Touch & Pointer Interceptor (Bypasses any canvas/main.js block) -->
   <script>
     window._firebaseHandlers = null;
-    window.royalLoginAction = function(type) {
+    window._lastAuthTap = 0;
+
+    function triggerRoyalAuth(type) {
+      const now = Date.now();
+      if (now - window._lastAuthTap < 500) return;
+      window._lastAuthTap = now;
+
+      if (type === "skip") {
+        document.getElementById("auth-gate-overlay")?.classList.add("hidden");
+        return;
+      }
       const st = document.getElementById("auth-status-msg");
       if (!window._firebaseHandlers) {
         if (st) {
           st.style.color = "#facc15";
-          st.textContent = "Starting secure connection... Tap again in 2 seconds.";
+          st.textContent = "Connecting to server... Tap again in 1 second.";
         }
         return;
       }
       window._firebaseHandlers.login(type);
-    };
+    }
+
+    function bindFastTap(id, type) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const handler = function(e) {
+        e.stopPropagation();
+        triggerRoyalAuth(type);
+      };
+      el.addEventListener("pointerdown", handler, true);
+      el.addEventListener("touchstart", handler, { capture: true, passive: true });
+      el.addEventListener("click", handler, true);
+    }
+
+    bindFastTap("act-google", "google");
+    bindFastTap("act-facebook", "facebook");
+    bindFastTap("act-guest", "guest");
+    bindFastTap("act-skip", "skip");
   </script>
 
   <!-- Existing Offline Engine & Board Scripts -->
@@ -514,7 +542,6 @@
       }
     }
 
-    // Handle redirect result if mobile browser used redirect
     getRedirectResult(auth).catch((err) => {
       if (statusMsg && err) {
         statusMsg.style.color = "#fca5a5";
@@ -529,25 +556,3 @@
           updateLobbyProfileUI(user, profile);
         } catch (err) {
           updateLobbyProfileUI(user, {
-            uid: user.uid,
-            name: user.displayName || `Royal_${user.uid.slice(0, 5)}`,
-            avatar: user.photoURL || "",
-            coins: 1000,
-            level: 1,
-            isGuest: user.isAnonymous || false
-          });
-        }
-      } else {
-        updateLobbyProfileUI(null, null);
-      }
-    });
-
-    window._firebaseHandlers = {
-      login: async (type) => {
-        statusMsg.style.color = "#facc15";
-        statusMsg.textContent = `Connecting (${type})...`;
-        try {
-          if (type === "guest") {
-            const res = await signInAnonymously(auth);
-            const profile = await ensurePlayerProfile(res.user);
-            if (nameEl) nameEl.textContent = profil
