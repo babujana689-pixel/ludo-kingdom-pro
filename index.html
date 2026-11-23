@@ -15,11 +15,8 @@
   <style>
     :root {
       --navy-deep: #070b19;
-      --navy-card: #0e162e;
-      --navy-elevated: #142042;
       --gold-primary: #facc15;
       --gold-rich: #d4af37;
-      --gold-amber: #f59e0b;
       --gold-border: rgba(250, 204, 21, 0.42);
       --text-clean: #f8fafc;
       --text-muted: #94a3b8;
@@ -31,16 +28,20 @@
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     }
 
+    #auth-gate-overlay,
+    #auth-gate-overlay * {
+      pointer-events: auto !important;
+    }
+
     .auth-gate-overlay {
       position: fixed;
       inset: 0;
-      z-index: 99999;
+      z-index: 999999;
       background: radial-gradient(circle at top, rgba(20, 32, 66, 0.96), rgba(5, 8, 20, 0.99));
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 18px;
-      pointer-events: auto;
     }
     .auth-gate-overlay.hidden {
       display: none !important;
@@ -54,85 +55,49 @@
       padding: 24px 20px;
       text-align: center;
       box-shadow: 0 22px 50px rgba(0, 0, 0, 0.85), 0 0 30px rgba(212, 175, 55, 0.25);
-      position: relative;
-      z-index: 100000;
     }
-    .auth-crown {
-      font-size: 2.6rem;
-      margin-bottom: 6px;
-      filter: drop-shadow(0 0 12px rgba(250, 204, 21, 0.5));
-    }
-    .auth-title {
-      font-size: 1.45rem;
-      font-weight: 900;
-      color: var(--gold-primary);
-      letter-spacing: 0.6px;
-      margin: 0 0 4px;
-    }
-    .auth-sub {
-      font-size: 0.82rem;
-      color: var(--text-muted);
-      margin: 0 0 18px;
-    }
+    .auth-crown { font-size: 2.6rem; margin-bottom: 6px; }
+    .auth-title { font-size: 1.45rem; font-weight: 900; color: var(--gold-primary); margin: 0 0 4px; }
+    .auth-sub { font-size: 0.82rem; color: var(--text-muted); margin: 0 0 18px; }
     .auth-btn {
       width: 100%;
-      padding: 13px 16px;
+      padding: 14px 16px;
       border-radius: 14px;
       font-weight: 800;
-      font-size: 0.92rem;
+      font-size: 0.95rem;
       border: none;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
-      margin-bottom: 10px;
+      margin-bottom: 11px;
       touch-action: manipulation;
-      transition: transform 0.15s ease, opacity 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
     }
     .auth-btn:active { transform: scale(0.96); }
-    .auth-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-    .btn-google {
-      background: #ffffff;
-      color: #0f172a;
-      box-shadow: 0 6px 18px rgba(255, 255, 255, 0.16);
-    }
-    .btn-facebook {
-      background: #1877f2;
-      color: #ffffff;
-      box-shadow: 0 6px 18px rgba(24, 119, 242, 0.35);
-    }
-    .btn-guest {
-      background: linear-gradient(135deg, #facc15, #d97706);
-      color: #070b19;
-      border: 1px solid #fef08a;
-      box-shadow: 0 6px 18px rgba(245, 158, 11, 0.35);
-    }
+    .btn-google { background: #ffffff; color: #0f172a; }
+    .btn-facebook { background: #1877f2; color: #ffffff; }
+    .btn-guest { background: linear-gradient(135deg, #facc15, #d97706); color: #070b19; border: 1px solid #fef08a; }
     .auth-skip-btn {
       margin-top: 8px;
-      padding: 8px 12px;
+      padding: 10px 14px;
       background: transparent;
       border: none;
       color: #cbd5e1;
-      font-size: 0.82rem;
+      font-size: 0.84rem;
       font-weight: 700;
       text-decoration: underline;
       cursor: pointer;
-      touch-action: manipulation;
     }
     .auth-status-msg {
       margin-top: 10px;
-      font-size: 0.78rem;
+      font-size: 0.8rem;
       color: #facc15;
-      min-height: 20px;
+      min-height: 22px;
       word-break: break-word;
     }
-    .avatar-ring img {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      object-fit: cover;
-    }
+    .avatar-ring img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
 
     .modal-overlay {
       background: rgba(4, 7, 18, 0.84);
@@ -144,7 +109,6 @@
       background: linear-gradient(165deg, #101b39 0%, #090f24 100%) !important;
       border: 1.5px solid var(--gold-rich) !important;
       border-radius: 20px !important;
-      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.75), 0 0 24px rgba(212, 175, 55, 0.25) !important;
       max-width: 420px;
       width: 100%;
       padding: 16px !important;
@@ -156,12 +120,7 @@
       padding-bottom: 10px;
       margin-bottom: 12px;
     }
-    .modal-header h2 {
-      color: var(--gold-primary) !important;
-      font-size: 1.05rem;
-      font-weight: 800;
-      letter-spacing: 0.4px;
-    }
+    .modal-header h2 { color: var(--gold-primary) !important; font-size: 1.05rem; font-weight: 800; }
     .modal-close {
       background: rgba(250, 204, 21, 0.14) !important;
       border: 1px solid var(--gold-border) !important;
@@ -170,7 +129,6 @@
       width: 32px;
       height: 32px;
     }
-
     .royal-section-title {
       font-size: 0.74rem;
       font-weight: 800;
@@ -178,16 +136,8 @@
       text-transform: uppercase;
       color: var(--gold-primary);
       margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
     }
-    .quick-modes-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 14px;
-    }
+    .quick-modes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
     .quick-mode-card {
       background: linear-gradient(145deg, #132044, #0c142c);
       border: 1px solid rgba(250, 204, 21, 0.35);
@@ -199,17 +149,10 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
       gap: 4px;
       cursor: pointer;
     }
-    .quick-mode-card:active { transform: scale(0.96); }
-    .slot-list {
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-      margin-bottom: 14px;
-    }
+    .slot-list { display: flex; flex-direction: column; gap: 7px; margin-bottom: 14px; }
     .slot-row {
       display: flex;
       align-items: center;
@@ -219,13 +162,7 @@
       border-radius: 13px;
       padding: 8px 11px;
     }
-    .slot-color-info {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: 800;
-      font-size: 0.85rem;
-    }
+    .slot-color-info { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 0.85rem; }
     .golden-start-btn {
       width: 100%;
       padding: 13px 16px;
@@ -235,9 +172,7 @@
       color: #070b19;
       font-weight: 900;
       font-size: 0.94rem;
-      letter-spacing: 0.5px;
       text-transform: uppercase;
-      box-shadow: 0 8px 22px rgba(245, 158, 11, 0.45);
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -273,22 +208,13 @@
       font-weight: 800;
       font-size: 0.76rem;
       border: 1px solid var(--gold-rich);
-      cursor: pointer;
-    }
-    .toggle-pill-btn.on {
       background: linear-gradient(135deg, #facc15, #d97706);
       color: #070b19;
+      cursor: pointer;
     }
 
     #game-hud { pointer-events: none; justify-content: space-between; }
-    .hud-top {
-      pointer-events: auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 12px;
-      z-index: 20;
-    }
+    .hud-top { pointer-events: auto; display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; z-index: 20; }
     .corner-pods-layer { position: fixed; inset: 0; pointer-events: none; z-index: 15; }
     .corner-pod {
       position: absolute;
@@ -299,39 +225,22 @@
       border-radius: 14px;
       background: rgba(11, 16, 33, 0.9);
       border: 1.5px solid rgba(212, 175, 55, 0.35);
-      backdrop-filter: blur(8px);
-      transition: all 0.25s ease;
       pointer-events: auto;
       cursor: pointer;
-      user-select: none;
     }
     .corner-pod.inactive-slot { opacity: 0.25; pointer-events: none; }
-    .corner-pod.active-turn {
-      border-color: #facc15;
-      box-shadow: 0 0 18px rgba(250, 204, 21, 0.7), inset 0 0 10px rgba(250, 204, 21, 0.25);
-      transform: scale(1.04);
-    }
-    .pod-label { font-weight: 800; font-size: 0.84rem; letter-spacing: 0.4px; white-space: nowrap; }
+    .corner-pod.active-turn { border-color: #facc15; box-shadow: 0 0 18px rgba(250, 204, 21, 0.7); }
+    .pod-label { font-weight: 800; font-size: 0.84rem; }
     .pod-sub { font-size: 0.68rem; font-weight: 700; color: #cbd5e1; display: block; }
     .pod-dice-box {
-      width: 44px;
-      height: 44px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(15, 23, 42, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      position: relative;
+      width: 44px; height: 44px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.15);
     }
-    .corner-pod.active-turn .pod-dice-box {
-      border-color: #fde047;
-      box-shadow: 0 0 12px rgba(250, 204, 21, 0.55);
-    }
-    .pod-red    { color: #ff5a5f; }
-    .pod-green  { color: #4ade80; }
+    .pod-red { color: #ff5a5f; }
+    .pod-green { color: #4ade80; }
     .pod-yellow { color: #facc15; }
-    .pod-blue   { color: #38bdf8; }
+    .pod-blue { color: #38bdf8; }
     .legacy-hidden { display: none !important; }
   </style>
 </head>
@@ -343,19 +252,19 @@
       <h2 class="auth-title">LUDO KINGDOM PRO</h2>
       <p class="auth-sub">Sign in to save coins, rank & play online</p>
 
-      <button type="button" class="auth-btn btn-google" id="btn-login-google">
+      <button type="button" class="auth-btn btn-google" onclick="window.royalLoginAction('google')">
         <span>🔴</span> Continue with Google
       </button>
 
-      <button type="button" class="auth-btn btn-facebook" id="btn-login-facebook">
+      <button type="button" class="auth-btn btn-facebook" onclick="window.royalLoginAction('facebook')">
         <span>🔵</span> Continue with Facebook
       </button>
 
-      <button type="button" class="auth-btn btn-guest" id="btn-login-guest">
+      <button type="button" class="auth-btn btn-guest" onclick="window.royalLoginAction('guest')">
         <span>🎲</span> Play as Guest (Instant)
       </button>
 
-      <button type="button" class="auth-skip-btn" id="btn-skip-login">
+      <button type="button" class="auth-skip-btn" onclick="document.getElementById('auth-gate-overlay').classList.add('hidden')">
         Play Offline Without Account
       </button>
 
@@ -363,7 +272,7 @@
     </div>
   </div>
 
-  <!-- 3D Canvas Background, Board & 4 Corner Glossy 3D Dice -->
+  <!-- 3D Canvas -->
   <canvas id="game-canvas"></canvas>
 
   <!-- HOME LOBBY SCREEN -->
@@ -378,44 +287,22 @@
       </div>
 
       <div class="currency-group">
-        <div class="currency-pill">
-          <span class="coin-icon">🟡</span>
-          <span id="coin-balance">1,000</span>
-        </div>
-        <div class="currency-pill">
-          <span class="gem-icon">💎</span>
-          <span id="gem-balance">25</span>
-        </div>
-        <button class="icon-btn" id="btn-settings" aria-label="Music & Sound Settings">⚙️</button>
+        <div class="currency-pill"><span class="coin-icon">🟡</span><span id="coin-balance">1,000</span></div>
+        <div class="currency-pill"><span class="gem-icon">💎</span><span id="gem-balance">25</span></div>
+        <button class="icon-btn" id="btn-settings" aria-label="Settings">⚙️</button>
       </div>
     </header>
 
     <aside class="side-dock">
-      <button class="dock-item" id="btn-daily">
-        <span class="dock-badge"></span>
-        <span class="dock-icon">🎁</span>
-        <span class="dock-label">Daily</span>
-      </button>
-      <button class="dock-item" id="btn-quests">
-        <span class="dock-icon">⚔️</span>
-        <span class="dock-label">Quests</span>
-      </button>
-      <button class="dock-item" id="btn-friends">
-        <span class="dock-icon">👥</span>
-        <span class="dock-label">Friends</span>
-      </button>
-      <button class="dock-item" id="btn-alerts">
-        <span class="dock-icon">🔔</span>
-        <span class="dock-label">Alerts</span>
-      </button>
+      <button class="dock-item" id="btn-daily"><span class="dock-badge"></span><span class="dock-icon">🎁</span><span class="dock-label">Daily</span></button>
+      <button class="dock-item" id="btn-quests"><span class="dock-icon">⚔️</span><span class="dock-label">Quests</span></button>
+      <button class="dock-item" id="btn-friends"><span class="dock-icon">👥</span><span class="dock-label">Friends</span></button>
+      <button class="dock-item" id="btn-alerts"><span class="dock-icon">🔔</span><span class="dock-label">Alerts</span></button>
     </aside>
 
     <main class="hero-center">
       <div class="royal-badge">★ ROYAL EDITION ★</div>
-      <h1 class="game-title">
-        <span class="title-main">LUDO KINGDOM</span>
-        <span class="title-3d">PRO</span>
-      </h1>
+      <h1 class="game-title"><span class="title-main">LUDO KINGDOM</span><span class="title-3d">PRO</span></h1>
       <p class="game-subtitle">Roll the Crown • Rule the Board</p>
     </main>
 
@@ -451,13 +338,13 @@
     </section>
   </div>
 
-  <!-- IN-GAME 3D BOARD HUD -->
+  <!-- IN-GAME HUD -->
   <div id="game-hud" class="screen">
     <div class="hud-top">
       <button class="hud-pill-btn" id="btn-exit-match">← Lobby</button>
       <div class="match-info-badge" id="match-mode-label">Ludo Kingdom Pro</div>
       <div style="display:flex;gap:6px;">
-        <button class="hud-pill-btn" id="btn-ingame-audio" aria-label="Audio Settings">🔊</button>
+        <button class="hud-pill-btn" id="btn-ingame-audio">🔊</button>
         <button class="hud-pill-btn" id="btn-reset-cam">🎥</button>
       </div>
     </div>
@@ -465,33 +352,18 @@
     <div class="corner-pods-layer" id="corner-pods-layer">
       <div class="corner-pod" id="hud-green" data-dice-color="green">
         <div class="pod-dice-box" id="dice-slot-green"></div>
-        <div>
-          <span class="pod-label pod-green" id="name-green">🟢 GREEN</span>
-          <span class="pod-sub" id="score-green">0/4</span>
-        </div>
+        <div><span class="pod-label pod-green" id="name-green">🟢 GREEN</span><span class="pod-sub" id="score-green">0/4</span></div>
       </div>
-
       <div class="corner-pod" id="hud-yellow" data-dice-color="yellow">
-        <div style="text-align:right;">
-          <span class="pod-label pod-yellow" id="name-yellow">🟡 YELLOW</span>
-          <span class="pod-sub" id="score-yellow">0/4</span>
-        </div>
+        <div style="text-align:right;"><span class="pod-label pod-yellow" id="name-yellow">🟡 YELLOW</span><span class="pod-sub" id="score-yellow">0/4</span></div>
         <div class="pod-dice-box" id="dice-slot-yellow"></div>
       </div>
-
       <div class="corner-pod" id="hud-red" data-dice-color="red">
         <div class="pod-dice-box" id="dice-slot-red"></div>
-        <div>
-          <span class="pod-label pod-red" id="name-red">🔴 RED</span>
-          <span class="pod-sub" id="score-red">0/4</span>
-        </div>
+        <div><span class="pod-label pod-red" id="name-red">🔴 RED</span><span class="pod-sub" id="score-red">0/4</span></div>
       </div>
-
       <div class="corner-pod" id="hud-blue" data-dice-color="blue">
-        <div style="text-align:right;">
-          <span class="pod-label pod-blue" id="name-blue">🔵 BLUE</span>
-          <span class="pod-sub" id="score-blue">0/4</span>
-        </div>
+        <div style="text-align:right;"><span class="pod-label pod-blue" id="name-blue">🔵 BLUE</span><span class="pod-sub" id="score-blue">0/4</span></div>
         <div class="pod-dice-box" id="dice-slot-blue"></div>
       </div>
     </div>
@@ -513,16 +385,31 @@
     </div>
   </div>
 
-  <!-- TOAST NOTIFICATION -->
   <div id="toast" class="toast hidden"></div>
 
-  <!-- Existing Offline Engine & Board Scripts (Untouched) -->
+  <!-- Immediate Global Click Handler (Works even before module finishes loading) -->
+  <script>
+    window._firebaseHandlers = null;
+    window.royalLoginAction = function(type) {
+      const st = document.getElementById("auth-status-msg");
+      if (!window._firebaseHandlers) {
+        if (st) {
+          st.style.color = "#facc15";
+          st.textContent = "Starting secure connection... Tap again in 2 seconds.";
+        }
+        return;
+      }
+      window._firebaseHandlers.login(type);
+    };
+  </script>
+
+  <!-- Existing Offline Engine & Board Scripts -->
   <script src="js/sound-fx.js"></script>
   <script src="js/board3d.js"></script>
   <script src="js/ludo-engine.js"></script>
   <script src="js/main.js"></script>
 
-  <!-- Direct Self-Contained Firebase Auth, Random Match & Private Room Module -->
+  <!-- Firebase Auth, Random Match & Private Room Module -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import {
@@ -530,6 +417,8 @@
       GoogleAuthProvider,
       FacebookAuthProvider,
       signInWithPopup,
+      signInWithRedirect,
+      getRedirectResult,
       signInAnonymously,
       signOut,
       onAuthStateChanged
@@ -565,11 +454,6 @@
 
     const authOverlay = document.getElementById("auth-gate-overlay");
     const statusMsg = document.getElementById("auth-status-msg");
-    const btnGoogle = document.getElementById("btn-login-google");
-    const btnFacebook = document.getElementById("btn-login-facebook");
-    const btnGuest = document.getElementById("btn-login-guest");
-    const btnSkip = document.getElementById("btn-skip-login");
-
     const modalOverlay = document.getElementById("modal-overlay");
     const modalTitle = document.getElementById("modal-title");
     const modalBody = document.getElementById("modal-body");
@@ -577,22 +461,11 @@
     window.currentRoyalUser = null;
     window.currentRoyalProfile = null;
     window.activeOnlineRoom = null;
-
     let activeRoomRef = null;
     let activeQueueRef = null;
 
     const COLOR_ORDER_2P = ["red", "yellow"];
     const COLOR_ORDER_4P = ["red", "green", "yellow", "blue"];
-
-    btnSkip.addEventListener("click", () => {
-      authOverlay.classList.add("hidden");
-    });
-
-    function setButtonsDisabled(disabled) {
-      btnGoogle.disabled = disabled;
-      btnFacebook.disabled = disabled;
-      btnGuest.disabled = disabled;
-    }
 
     async function ensurePlayerProfile(user) {
       const userRef = ref(db, `users/${user.uid}`);
@@ -627,4 +500,54 @@
       if (user && profile) {
         window.currentRoyalUser = user;
         window.currentRoyalProfile = profile;
-        if (nameEl) nameEl.textContent = profil
+        if (nameEl) nameEl.textContent = profile.name || "Royal Player";
+        if (levelEl) levelEl.textContent = `Lvl ${profile.level || 1} • ${profile.isGuest ? "Guest" : "Verified"}`;
+        if (coinEl) coinEl.textContent = Number(profile.coins || 1000).toLocaleString();
+        if (avatarBox) avatarBox.innerHTML = profile.avatar ? `<img src="${profile.avatar}" alt="Avatar" />` : "👑";
+        authOverlay.classList.add("hidden");
+      } else {
+        window.currentRoyalUser = null;
+        window.currentRoyalProfile = null;
+        if (nameEl) nameEl.textContent = "Royal Guest";
+        if (levelEl) levelEl.textContent = "Lvl 1 • Offline";
+        if (avatarBox) avatarBox.innerHTML = "👑";
+      }
+    }
+
+    // Handle redirect result if mobile browser used redirect
+    getRedirectResult(auth).catch((err) => {
+      if (statusMsg && err) {
+        statusMsg.style.color = "#fca5a5";
+        statusMsg.textContent = `Auth Error: ${err.code || err.message}`;
+      }
+    });
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const profile = await ensurePlayerProfile(user);
+          updateLobbyProfileUI(user, profile);
+        } catch (err) {
+          updateLobbyProfileUI(user, {
+            uid: user.uid,
+            name: user.displayName || `Royal_${user.uid.slice(0, 5)}`,
+            avatar: user.photoURL || "",
+            coins: 1000,
+            level: 1,
+            isGuest: user.isAnonymous || false
+          });
+        }
+      } else {
+        updateLobbyProfileUI(null, null);
+      }
+    });
+
+    window._firebaseHandlers = {
+      login: async (type) => {
+        statusMsg.style.color = "#facc15";
+        statusMsg.textContent = `Connecting (${type})...`;
+        try {
+          if (type === "guest") {
+            const res = await signInAnonymously(auth);
+            const profile = await ensurePlayerProfile(res.user);
+            if (nameEl) nameEl.textContent = profil
