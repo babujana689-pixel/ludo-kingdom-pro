@@ -31,7 +31,6 @@
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     }
 
-    /* Royal Login Screen Overlay */
     .auth-gate-overlay {
       position: fixed;
       inset: 0;
@@ -91,13 +90,8 @@
       touch-action: manipulation;
       transition: transform 0.15s ease, opacity 0.2s ease;
     }
-    .auth-btn:active {
-      transform: scale(0.96);
-    }
-    .auth-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
+    .auth-btn:active { transform: scale(0.96); }
+    .auth-btn:disabled { opacity: 0.6; cursor: not-allowed; }
     .btn-google {
       background: #ffffff;
       color: #0f172a;
@@ -140,7 +134,6 @@
       object-fit: cover;
     }
 
-    /* Premium Modal Card Styling */
     .modal-overlay {
       background: rgba(4, 7, 18, 0.84);
       backdrop-filter: blur(10px);
@@ -210,9 +203,7 @@
       gap: 4px;
       cursor: pointer;
     }
-    .quick-mode-card:active {
-      transform: scale(0.96);
-    }
+    .quick-mode-card:active { transform: scale(0.96); }
     .slot-list {
       display: flex;
       flex-direction: column;
@@ -234,34 +225,6 @@
       gap: 8px;
       font-weight: 800;
       font-size: 0.85rem;
-    }
-    .slot-dot {
-      width: 13px;
-      height: 13px;
-      border-radius: 50%;
-      box-shadow: 0 0 8px currentColor;
-    }
-    .role-switch-group {
-      display: flex;
-      gap: 5px;
-      background: #070c1c;
-      padding: 3px;
-      border-radius: 10px;
-      border: 1px solid rgba(148, 163, 184, 0.2);
-    }
-    .role-pill {
-      padding: 5px 10px;
-      border-radius: 8px;
-      font-size: 0.74rem;
-      font-weight: 800;
-      border: none;
-      background: transparent;
-      color: #94a3b8;
-      cursor: pointer;
-    }
-    .role-pill.active {
-      background: linear-gradient(135deg, #facc15, #d97706);
-      color: #070b19;
     }
     .golden-start-btn {
       width: 100%;
@@ -304,23 +267,6 @@
       text-align: center;
       margin-bottom: 12px;
     }
-
-    .audio-setting-card {
-      background: rgba(11, 18, 38, 0.92);
-      border: 1px solid rgba(212, 175, 55, 0.35);
-      border-radius: 14px;
-      padding: 12px;
-      margin-bottom: 10px;
-    }
-    .audio-row-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
-      font-weight: 800;
-      font-size: 0.88rem;
-      color: #f8fafc;
-    }
     .toggle-pill-btn {
       padding: 5px 14px;
       border-radius: 999px;
@@ -333,22 +279,8 @@
       background: linear-gradient(135deg, #facc15, #d97706);
       color: #070b19;
     }
-    .toggle-pill-btn.off {
-      background: #1e293b;
-      color: #94a3b8;
-      border-color: #475569;
-    }
-    .royal-slider {
-      width: 100%;
-      accent-color: #facc15;
-      height: 6px;
-      cursor: pointer;
-    }
 
-    #game-hud {
-      pointer-events: none;
-      justify-content: space-between;
-    }
+    #game-hud { pointer-events: none; justify-content: space-between; }
     .hud-top {
       pointer-events: auto;
       display: flex;
@@ -357,12 +289,7 @@
       padding: 8px 12px;
       z-index: 20;
     }
-    .corner-pods-layer {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 15;
-    }
+    .corner-pods-layer { position: fixed; inset: 0; pointer-events: none; z-index: 15; }
     .corner-pod {
       position: absolute;
       display: flex;
@@ -378,27 +305,14 @@
       cursor: pointer;
       user-select: none;
     }
-    .corner-pod.inactive-slot {
-      opacity: 0.25;
-      pointer-events: none;
-    }
+    .corner-pod.inactive-slot { opacity: 0.25; pointer-events: none; }
     .corner-pod.active-turn {
       border-color: #facc15;
       box-shadow: 0 0 18px rgba(250, 204, 21, 0.7), inset 0 0 10px rgba(250, 204, 21, 0.25);
       transform: scale(1.04);
     }
-    .pod-label {
-      font-weight: 800;
-      font-size: 0.84rem;
-      letter-spacing: 0.4px;
-      white-space: nowrap;
-    }
-    .pod-sub {
-      font-size: 0.68rem;
-      font-weight: 700;
-      color: #cbd5e1;
-      display: block;
-    }
+    .pod-label { font-weight: 800; font-size: 0.84rem; letter-spacing: 0.4px; white-space: nowrap; }
+    .pod-sub { font-size: 0.68rem; font-weight: 700; color: #cbd5e1; display: block; }
     .pod-dice-box {
       width: 44px;
       height: 44px;
@@ -418,7 +332,6 @@
     .pod-green  { color: #4ade80; }
     .pod-yellow { color: #facc15; }
     .pod-blue   { color: #38bdf8; }
-
     .legacy-hidden { display: none !important; }
   </style>
 </head>
@@ -609,70 +522,109 @@
   <script src="js/ludo-engine.js"></script>
   <script src="js/main.js"></script>
 
-  <!-- Immediate Fallback Click Handler -->
-  <script>
-    window.royalAuthActions = {
-      google: null,
-      facebook: null,
-      guest: null,
-      logout: null
+  <!-- Direct Self-Contained Firebase Auth, Random Match & Private Room Module -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getAuth,
+      GoogleAuthProvider,
+      FacebookAuthProvider,
+      signInWithPopup,
+      signInAnonymously,
+      signOut,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      getDatabase,
+      ref,
+      get,
+      set,
+      update,
+      remove,
+      onValue,
+      off,
+      push
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB-LX_SEe3SXMjF3C-AjTu7NHLHYWmsIF4",
+      authDomain: "ludo-kingdom-pro.firebaseapp.com",
+      databaseURL: "https://ludo-kingdom-pro-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "ludo-kingdom-pro",
+      storageBucket: "ludo-kingdom-pro.firebasestorage.app",
+      messagingSenderId: "497347829715",
+      appId: "1:497347829715:web:887eeb636ca2857739d926",
+      measurementId: "G-HDF5KWTM4K"
     };
 
-    (function () {
-      const authOverlay = document.getElementById("auth-gate-overlay");
-      const statusMsg = document.getElementById("auth-status-msg");
-
-      document.getElementById("btn-skip-login").addEventListener("click", function () {
-        authOverlay.classList.add("hidden");
-      });
-
-      document.getElementById("btn-login-google").addEventListener("click", function () {
-        if (window.royalAuthActions.google) {
-          window.royalAuthActions.google();
-        } else {
-          statusMsg.textContent = "Loading Firebase... Test on Chrome/GitHub Pages for popup login.";
-        }
-      });
-
-      document.getElementById("btn-login-facebook").addEventListener("click", function () {
-        if (window.royalAuthActions.facebook) {
-          window.royalAuthActions.facebook();
-        } else {
-          statusMsg.textContent = "Loading Firebase... Test on Chrome/GitHub Pages for popup login.";
-        }
-      });
-
-      document.getElementById("btn-login-guest").addEventListener("click", function () {
-        if (window.royalAuthActions.guest) {
-          window.royalAuthActions.guest();
-        } else {
-          statusMsg.textContent = "Loading Firebase... Please wait a second.";
-        }
-      });
-    })();
-  </script>
-
-  <!-- Firebase Auth, Profile, Random Matchmaking & Private Room UI Bridge -->
-  <script type="module">
-    import {
-      loginWithGoogle,
-      loginWithFacebook,
-      loginAsGuest,
-      logoutPlayer,
-      watchAuthState
-    } from "./js/auth-profile.js";
-
-    import {
-      createPrivateRoom,
-      joinPrivateRoom,
-      findOnlineMatch,
-      subscribeToRoom,
-      startOnlineRoomMatch,
-      leaveOnlineRoom
-    } from "./js/online-room.js";
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+    const googleProvider = new GoogleAuthProvider();
+    const facebookProvider = new FacebookAuthProvider();
 
     const authOverlay = document.getElementById("auth-gate-overlay");
     const statusMsg = document.getElementById("auth-status-msg");
     const btnGoogle = document.getElementById("btn-login-google");
     const btnFacebook = document.getElementById("btn-login-facebook");
-   
+    const btnGuest = document.getElementById("btn-login-guest");
+    const btnSkip = document.getElementById("btn-skip-login");
+
+    const modalOverlay = document.getElementById("modal-overlay");
+    const modalTitle = document.getElementById("modal-title");
+    const modalBody = document.getElementById("modal-body");
+
+    window.currentRoyalUser = null;
+    window.currentRoyalProfile = null;
+    window.activeOnlineRoom = null;
+
+    let activeRoomRef = null;
+    let activeQueueRef = null;
+
+    const COLOR_ORDER_2P = ["red", "yellow"];
+    const COLOR_ORDER_4P = ["red", "green", "yellow", "blue"];
+
+    btnSkip.addEventListener("click", () => {
+      authOverlay.classList.add("hidden");
+    });
+
+    function setButtonsDisabled(disabled) {
+      btnGoogle.disabled = disabled;
+      btnFacebook.disabled = disabled;
+      btnGuest.disabled = disabled;
+    }
+
+    async function ensurePlayerProfile(user) {
+      const userRef = ref(db, `users/${user.uid}`);
+      const snap = await get(userRef);
+      if (!snap.exists()) {
+        const newProfile = {
+          uid: user.uid,
+          name: user.displayName || `Royal_${user.uid.slice(0, 5)}`,
+          avatar: user.photoURL || "",
+          coins: 1000,
+          gems: 25,
+          level: 1,
+          wins: 0,
+          isGuest: user.isAnonymous || false,
+          createdAt: Date.now()
+        };
+        await set(userRef, newProfile);
+        return newProfile;
+      } else {
+        const existing = snap.val();
+        await update(userRef, { lastLogin: Date.now() });
+        return existing;
+      }
+    }
+
+    function updateLobbyProfileUI(user, profile) {
+      const nameEl = document.getElementById("display-name");
+      const levelEl = document.getElementById("player-level-badge");
+      const coinEl = document.getElementById("coin-balance");
+      const avatarBox = document.getElementById("player-avatar-box");
+
+      if (user && profile) {
+        window.currentRoyalUser = user;
+        window.currentRoyalProfile = profile;
+        if (nameEl) nameEl.textContent = profil
