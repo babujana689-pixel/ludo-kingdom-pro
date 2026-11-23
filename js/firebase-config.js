@@ -1,88 +1,24 @@
-// Authentication & Royal Player Profile Manager
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
-  auth,
-  db,
-  googleProvider,
-  facebookProvider
-} from "./firebase-config.js";
-import {
-  signInWithPopup,
-  signInAnonymously,
-  signOut,
-  onAuthStateChanged
+  getAuth,
+  GoogleAuthProvider,
+  FacebookAuthProvider
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import {
-  ref,
-  get,
-  set,
-  update
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { getDatabase } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-async function ensurePlayerProfile(user) {
-  const userRef = ref(db, `users/${user.uid}`);
-  const snap = await get(userRef);
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
 
-  if (!snap.exists()) {
-    const newProfile = {
-      uid: user.uid,
-      name: user.displayName || `Royal_${user.uid.slice(0, 5)}`,
-      avatar: user.photoURL || "",
-      coins: 1000,
-      gems: 25,
-      level: 1,
-      wins: 0,
-      isGuest: user.isAnonymous || false,
-      createdAt: Date.now()
-    };
-    await set(userRef, newProfile);
-    return newProfile;
-  } else {
-    const existing = snap.val();
-    await update(userRef, { lastLogin: Date.now() });
-    return existing;
-  }
-}
+const app = initializeApp(firebaseConfig);
 
-export async function loginWithGoogle() {
-  const res = await signInWithPopup(auth, googleProvider);
-  return await ensurePlayerProfile(res.user);
-}
-
-export async function loginWithFacebook() {
-  const res = await signInWithPopup(auth, facebookProvider);
-  return await ensurePlayerProfile(res.user);
-}
-
-export async function loginAsGuest() {
-  const res = await signInAnonymously(auth);
-  return await ensurePlayerProfile(res.user);
-}
-
-export async function logoutPlayer() {
-  await signOut(auth);
-}
-
-export function watchAuthState(callback) {
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      try {
-        const profile = await ensurePlayerProfile(user);
-        callback(user, profile);
-      } catch (err) {
-        console.error("Database profile fallback:", err);
-        callback(user, {
-          uid: user.uid,
-          name: user.displayName || `Royal_${user.uid.slice(0, 5)}`,
-          avatar: user.photoURL || "",
-          coins: 1000,
-          gems: 25,
-          level: 1,
-          wins: 0,
-          isGuest: user.isAnonymous || false
-        });
-      }
-    } else {
-      callback(null, null);
-    }
-  });
-}
+export const auth = getAuth(app);
+export const db = getDatabase(app);
+export const googleProvider = new GoogleAuthProvider();
+export const facebookProvider = new FacebookAuthProvider();
