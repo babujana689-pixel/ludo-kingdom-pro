@@ -12,9 +12,6 @@
       document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>');
     }
   </script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
   <style>
     :root {
       --navy-deep: #070b19;
@@ -24,23 +21,21 @@
       --text-clean: #f8fafc;
       --text-muted: #94a3b8;
     }
-
     body {
       background: var(--navy-deep);
       color: var(--text-clean);
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     }
-
-    /* Royal Login Overlay */
     .auth-gate-overlay {
       position: fixed;
       inset: 0;
-      z-index: 999999;
-      background: radial-gradient(circle at top, rgba(20, 32, 66, 0.97), rgba(5, 8, 20, 0.99));
+      z-index: 99999;
+      background: radial-gradient(circle at top, rgba(20, 32, 66, 0.96), rgba(5, 8, 20, 0.99));
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 18px;
+      pointer-events: auto;
     }
     .auth-gate-overlay.hidden { display: none !important; }
     .auth-card {
@@ -52,55 +47,46 @@
       padding: 24px 20px;
       text-align: center;
       box-shadow: 0 22px 50px rgba(0, 0, 0, 0.85);
+      pointer-events: auto;
     }
     .auth-crown { font-size: 2.6rem; margin-bottom: 6px; }
     .auth-title { font-size: 1.45rem; font-weight: 900; color: var(--gold-primary); margin: 0 0 4px; }
     .auth-sub { font-size: 0.82rem; color: var(--text-muted); margin: 0 0 18px; }
     .auth-btn {
       width: 100%;
-      padding: 14px 16px;
+      padding: 13px 16px;
       border-radius: 14px;
       font-weight: 800;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       border: none;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
-      margin-bottom: 11px;
+      margin-bottom: 10px;
+      pointer-events: auto;
+      touch-action: manipulation;
     }
-    .auth-btn:active { transform: scale(0.96); }
     .btn-google { background: #ffffff; color: #0f172a; }
     .btn-facebook { background: #1877f2; color: #ffffff; }
     .btn-guest { background: linear-gradient(135deg, #facc15, #d97706); color: #070b19; border: 1px solid #fef08a; }
     .auth-skip-btn {
       margin-top: 8px;
-      padding: 10px 14px;
+      padding: 8px 12px;
       background: transparent;
       border: none;
       color: #cbd5e1;
-      font-size: 0.84rem;
+      font-size: 0.82rem;
       font-weight: 700;
       text-decoration: underline;
       cursor: pointer;
+      pointer-events: auto;
+      touch-action: manipulation;
     }
-    .auth-status-msg {
-      margin-top: 10px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: #4ade80;
-      min-height: 20px;
-    }
+    .auth-status-msg { margin-top: 10px; font-size: 0.78rem; color: #facc15; min-height: 20px; }
     .avatar-ring img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
-
-    /* Modal & Offline Setup UI */
-    .modal-overlay {
-      background: rgba(4, 7, 18, 0.84);
-      backdrop-filter: blur(10px);
-      padding: 12px;
-      z-index: 9000;
-    }
+    .modal-overlay { background: rgba(4, 7, 18, 0.84); backdrop-filter: blur(10px); padding: 12px; z-index: 9000; }
     .modal-card {
       background: linear-gradient(165deg, #101b39 0%, #090f24 100%) !important;
       border: 1.5px solid var(--gold-rich) !important;
@@ -111,11 +97,7 @@
       max-height: 88vh;
       overflow-y: auto;
     }
-    .modal-header {
-      border-bottom: 1px solid rgba(250, 204, 21, 0.25);
-      padding-bottom: 10px;
-      margin-bottom: 12px;
-    }
+    .modal-header { border-bottom: 1px solid rgba(250, 204, 21, 0.25); padding-bottom: 10px; margin-bottom: 12px; }
     .modal-header h2 { color: var(--gold-primary) !important; font-size: 1.05rem; font-weight: 800; }
     .modal-close {
       background: rgba(250, 204, 21, 0.14) !important;
@@ -125,14 +107,7 @@
       width: 32px;
       height: 32px;
     }
-    .royal-section-title {
-      font-size: 0.74rem;
-      font-weight: 800;
-      letter-spacing: 0.8px;
-      text-transform: uppercase;
-      color: var(--gold-primary);
-      margin-bottom: 8px;
-    }
+    .royal-section-title { font-size: 0.74rem; font-weight: 800; text-transform: uppercase; color: var(--gold-primary); margin-bottom: 8px; }
     .quick-modes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
     .quick-mode-card {
       background: linear-gradient(145deg, #132044, #0c142c);
@@ -148,11 +123,6 @@
       gap: 4px;
       cursor: pointer;
     }
-    .quick-mode-card.selected-preset {
-      border-color: #facc15;
-      background: linear-gradient(145deg, #1e3269, #122048);
-      box-shadow: 0 0 12px rgba(250, 204, 21, 0.35);
-    }
     .slot-list { display: flex; flex-direction: column; gap: 7px; margin-bottom: 14px; }
     .slot-row {
       display: flex;
@@ -164,22 +134,6 @@
       padding: 8px 11px;
     }
     .slot-color-info { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 0.85rem; }
-    .slot-dot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
-    .role-switch-group { display: flex; gap: 4px; background: #070b19; padding: 3px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); }
-    .role-pill {
-      padding: 4px 9px;
-      border-radius: 7px;
-      border: none;
-      background: transparent;
-      color: #94a3b8;
-      font-size: 0.72rem;
-      font-weight: 800;
-      cursor: pointer;
-    }
-    .role-pill.active {
-      background: linear-gradient(135deg, #facc15, #d97706);
-      color: #070b19;
-    }
     .golden-start-btn {
       width: 100%;
       padding: 13px 16px;
@@ -211,26 +165,8 @@
       margin-bottom: 10px;
       box-sizing: border-box;
     }
-    .room-code-banner {
-      background: rgba(250, 204, 21, 0.12);
-      border: 1.5px dashed #facc15;
-      border-radius: 14px;
-      padding: 12px;
-      text-align: center;
-      margin-bottom: 12px;
-    }
-    .toggle-pill-btn {
-      padding: 5px 14px;
-      border-radius: 999px;
-      font-weight: 800;
-      font-size: 0.76rem;
-      border: 1px solid var(--gold-rich);
-      background: linear-gradient(135deg, #facc15, #d97706);
-      color: #070b19;
-      cursor: pointer;
-    }
-
-    /* HUD */
+    .room-code-banner { background: rgba(250, 204, 21, 0.12); border: 1.5px dashed #facc15; border-radius: 14px; padding: 12px; text-align: center; margin-bottom: 12px; }
+    .toggle-pill-btn { padding: 5px 14px; border-radius: 999px; font-weight: 800; font-size: 0.76rem; border: 1px solid var(--gold-rich); background: linear-gradient(135deg, #facc15, #d97706); color: #070b19; cursor: pointer; }
     #game-hud { pointer-events: none; justify-content: space-between; }
     .hud-top { pointer-events: auto; display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; z-index: 20; }
     .corner-pods-layer { position: fixed; inset: 0; pointer-events: none; z-index: 15; }
@@ -250,11 +186,7 @@
     .corner-pod.active-turn { border-color: #facc15; box-shadow: 0 0 18px rgba(250, 204, 21, 0.7); }
     .pod-label { font-weight: 800; font-size: 0.84rem; }
     .pod-sub { font-size: 0.68rem; font-weight: 700; color: #cbd5e1; display: block; }
-    .pod-dice-box {
-      width: 44px; height: 44px; border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.15);
-    }
+    .pod-dice-box { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.15); }
     .pod-red { color: #ff5a5f; }
     .pod-green { color: #4ade80; }
     .pod-yellow { color: #facc15; }
@@ -263,37 +195,21 @@
   </style>
 </head>
 <body>
-  <!-- ROYAL LOGIN SCREEN OVERLAY -->
   <div id="auth-gate-overlay" class="auth-gate-overlay">
     <div class="auth-card">
       <div class="auth-crown">👑</div>
       <h2 class="auth-title">LUDO KINGDOM PRO</h2>
       <p class="auth-sub">Sign in to save coins, rank & play online</p>
-
-      <button type="button" id="act-google" class="auth-btn btn-google">
-        <span>🔴</span> Continue with Google
-      </button>
-
-      <button type="button" id="act-facebook" class="auth-btn btn-facebook">
-        <span>🔵</span> Continue with Facebook
-      </button>
-
-      <button type="button" id="act-guest" class="auth-btn btn-guest">
-        <span>🎲</span> Play as Guest (Instant)
-      </button>
-
-      <button type="button" id="act-skip" class="auth-skip-btn">
-        Play Offline Without Account
-      </button>
-
+      <button type="button" class="auth-btn btn-google" id="btn-login-google"><span>🔴</span> Continue with Google</button>
+      <button type="button" class="auth-btn btn-facebook" id="btn-login-facebook"><span>🔵</span> Continue with Facebook</button>
+      <button type="button" class="auth-btn btn-guest" id="btn-login-guest"><span>🎲</span> Play as Guest (Instant)</button>
+      <button type="button" class="auth-skip-btn" id="btn-skip-login">Play Offline Without Account</button>
       <div class="auth-status-msg" id="auth-status-msg"></div>
     </div>
   </div>
 
-  <!-- 3D Canvas -->
   <canvas id="game-canvas"></canvas>
 
-  <!-- HOME LOBBY SCREEN -->
   <div id="home-screen" class="screen active">
     <header class="top-bar">
       <div class="profile-pill" id="btn-profile">
@@ -303,7 +219,6 @@
           <span class="player-level" id="player-level-badge">Lvl 1 • Novice</span>
         </div>
       </div>
-
       <div class="currency-group">
         <div class="currency-pill"><span class="coin-icon">🟡</span><span id="coin-balance">1,000</span></div>
         <div class="currency-pill"><span class="gem-icon">💎</span><span id="gem-balance">25</span></div>
@@ -339,7 +254,6 @@
           <span class="mode-title">Online Match</span>
           <span class="mode-tag">2P / 4P Live</span>
         </button>
-
         <button class="mode-card" id="btn-private-room">
           <span class="mode-icon">🏰</span>
           <span class="mode-title">Private Room</span>
@@ -356,7 +270,6 @@
     </section>
   </div>
 
-  <!-- IN-GAME HUD -->
   <div id="game-hud" class="screen">
     <div class="hud-top">
       <button class="hud-pill-btn" id="btn-exit-match">← Lobby</button>
@@ -392,7 +305,6 @@
     </div>
   </div>
 
-  <!-- MODAL OVERLAY -->
   <div id="modal-overlay" class="modal-overlay hidden">
     <div class="modal-card">
       <div class="modal-header">
@@ -405,425 +317,167 @@
 
   <div id="toast" class="toast hidden"></div>
 
-  <!-- Core Offline Game Scripts -->
   <script src="js/sound-fx.js"></script>
   <script src="js/board3d.js"></script>
   <script src="js/ludo-engine.js"></script>
   <script src="js/main.js"></script>
 
-  <!-- Firebase Auth & Online Room Controller -->
   <script>
-    (function() {
-      const statusMsg = document.getElementById("auth-status-msg");
-      const authOverlay = document.getElementById("auth-gate-overlay");
-      const modalOverlay = document.getElementById("modal-overlay");
-      const modalTitle = document.getElementById("modal-title");
-      const modalBody = document.getElementById("modal-body");
+    (function () {
+      const overlay = document.getElementById("auth-gate-overlay");
+      const statusEl = document.getElementById("auth-status-msg");
+      const skipBtn = document.getElementById("btn-skip-login");
+      const googleBtn = document.getElementById("btn-login-google");
+      const fbBtn = document.getElementById("btn-login-facebook");
+      const guestBtn = document.getElementById("btn-login-guest");
 
-      // Always allow Offline Skip button immediately
-      document.getElementById("act-skip").addEventListener("click", function() {
-        authOverlay.classList.add("hidden");
-      });
-
-      if (typeof firebase === "undefined") {
-        if (statusMsg) {
-          statusMsg.style.color = "#facc15";
-          statusMsg.textContent = "Offline Mode Ready (Tap 'Play Offline Without Account')";
-        }
-        return;
+      if (overlay) {
+        overlay.style.pointerEvents = "auto";
+        overlay.style.zIndex = "2147483647";
       }
 
-      const firebaseConfig = {
-        apiKey: "AIzaSyB-LX_SEe3SXMjF3C-AjTu7NHLHYWmsIF4",
-        authDomain: "ludo-kingdom-pro.firebaseapp.com",
-        databaseURL: "https://ludo-kingdom-pro-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "ludo-kingdom-pro",
-        storageBucket: "ludo-kingdom-pro.firebasestorage.app",
-        messagingSenderId: "497347829715",
-        appId: "1:497347829715:web:887eeb636ca2857739d926",
-        measurementId: "G-HDF5KWTM4K"
-      };
-
-      if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-      const auth = firebase.auth();
-      const db = firebase.database();
-
-      window.currentRoyalUser = null;
-      window.currentRoyalProfile = null;
-      window.activeOnlineRoom = null;
-      let activeRoomRef = null;
-      let activeQueueRef = null;
-
-      const COLOR_ORDER_2P = ["red", "yellow"];
-      const COLOR_ORDER_4P = ["red", "green", "yellow", "blue"];
-
-      async function ensurePlayerProfile(user) {
-        const userRef = db.ref("users/" + user.uid);
-        const snap = await userRef.once("value");
-        if (!snap.exists()) {
-          const newProfile = {
-            uid: user.uid,
-            name: user.displayName || ("Royal_" + user.uid.slice(0, 5)),
-            avatar: user.photoURL || "",
-            coins: 1000,
-            gems: 25,
-            level: 1,
-            wins: 0,
-            isGuest: user.isAnonymous || false,
-            createdAt: Date.now()
-          };
-          await userRef.set(newProfile);
-          return newProfile;
-        } else {
-          const existing = snap.val();
-          await userRef.update({ lastLogin: Date.now() });
-          return existing;
-        }
-      }
-
-      function updateLobbyProfileUI(user, profile) {
-        const nameEl = document.getElementById("display-name");
-        const levelEl = document.getElementById("player-level-badge");
-        const coinEl = document.getElementById("coin-balance");
-        const avatarBox = document.getElementById("player-avatar-box");
-
-        if (user && profile) {
-          window.currentRoyalUser = user;
-          window.currentRoyalProfile = profile;
-          if (nameEl) nameEl.textContent = profile.name || "Royal Player";
-          if (levelEl) levelEl.textContent = "Lvl " + (profile.level || 1) + " • " + (profile.isGuest ? "Guest" : "Verified");
-          if (coinEl) coinEl.textContent = Number(profile.coins || 1000).toLocaleString();
-          if (avatarBox) avatarBox.innerHTML = profile.avatar ? '<img src="' + profile.avatar + '" alt="Avatar" />' : "👑";
-          authOverlay.classList.add("hidden");
-        } else {
-          window.currentRoyalUser = null;
-          window.currentRoyalProfile = null;
-          if (nameEl) nameEl.textContent = "Royal Guest";
-          if (levelEl) levelEl.textContent = "Lvl 1 • Offline";
-          if (avatarBox) avatarBox.innerHTML = "👑";
-        }
-      }
-
-      auth.onAuthStateChanged(async function(user) {
-        if (user) {
-          try {
-            const profile = await ensurePlayerProfile(user);
-            updateLobbyProfileUI(user, profile);
-          } catch (e) {
-            updateLobbyProfileUI(user, {
-              uid: user.uid,
-              name: user.displayName || ("Royal_" + user.uid.slice(0, 5)),
-              avatar: user.photoURL || "",
-              coins: 1000,
-              level: 1,
-              isGuest: user.isAnonymous || false
-            });
-          }
-        } else {
-          updateLobbyProfileUI(null, null);
-        }
-      });
-
-      async function handleAuthClick(type) {
-        statusMsg.style.color = "#facc15";
-        statusMsg.textContent = "Signing in (" + type + ")...";
-        try {
-          if (type === "guest") {
-            const res = await auth.signInAnonymously();
-            const profile = await ensurePlayerProfile(res.user);
-            updateLobbyProfileUI(res.user, profile);
-            statusMsg.textContent = "";
-          } else {
-            const             const provider = type === "google"
-              ? new firebase.auth.GoogleAuthProvider()
-              : new firebase.auth.FacebookAuthProvider();
-            try {
-              const res = await auth.signInWithPopup(provider);
-              const profile = await ensurePlayerProfile(res.user);
-              updateLobbyProfileUI(res.user, profile);
-              statusMsg.textContent = "";
-            } catch (popupErr) {
-              if (popupErr && (popupErr.code === "auth/popup-blocked" || popupErr.code === "auth/operation-not-supported-in-this-environment")) {
-                await auth.signInWithRedirect(provider);
-              } else {
-                throw popupErr;
-              }
+      if (skipBtn) {
+        ["click", "touchend"].forEach((ev) => {
+          skipBtn.addEventListener(ev, function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (overlay) {
+              overlay.classList.add("hidden");
+              overlay.style.display = "none";
             }
-          }
-        } catch (err) {
-          statusMsg.style.color = "#fca5a5";
-          statusMsg.textContent = "Error: " + (err.code || err.message);
-        }
-      }
-
-      document.getElementById("act-google").addEventListener("click", function() { handleAuthClick("google"); });
-      document.getElementById("act-facebook").addEventListener("click", function() { handleAuthClick("facebook"); });
-      document.getElementById("act-guest").addEventListener("click", function() { handleAuthClick("guest"); });
-
-      // --- ROOM & MATCHMAKING ---
-      function generateRoomCode() {
-        const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-        let code = "";
-        for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
-        return code;
-      }
-
-      function getMe() {
-        const u = auth.currentUser;
-        const p = window.currentRoyalProfile;
-        if (!u) return null;
-        return {
-          uid: u.uid,
-          name: (p && p.name) || u.displayName || ("Player_" + u.uid.slice(0, 5)),
-          avatar: (p && p.avatar) || u.photoURL || "",
-          ready: true,
-          joinedAt: Date.now()
-        };
-      }
-
-      function buildRoomPayload(roomId, hostPlayer, maxPlayers, isPrivate) {
-        const colors = maxPlayers === 2 ? COLOR_ORDER_2P : COLOR_ORDER_4P;
-        const players = {};
-        players[hostPlayer.uid] = Object.assign({}, hostPlayer, { color: colors[0], isHost: true });
-        return {
-          roomId: roomId,
-          isPrivate: isPrivate,
-          maxPlayers: maxPlayers,
-          status: "waiting",
-          hostUid: hostPlayer.uid,
-          turnColor: colors[0],
-          lastDice: 0,
-          lastMove: null,
-          createdAt: Date.now(),
-          players: players
-        };
-      }
-
-      async function createPrivateRoom(maxPlayers) {
-        const me = getMe();
-        if (!me) throw new Error("Sign in first.");
-        const roomCode = generateRoomCode();
-        const payload = buildRoomPayload(roomCode, me, maxPlayers, true);
-        await db.ref("rooms/" + roomCode).set(payload);
-        return payload;
-      }
-
-      async function joinRoomByCode(codeInput) {
-        const me = getMe();
-        if (!me) throw new Error("Sign in first.");
-        const roomCode = codeInput.trim().toUpperCase();
-        if (roomCode.length < 4) throw new Error("Enter valid room code.");
-        const roomRef = db.ref("rooms/" + roomCode);
-        const snap = await roomRef.once("value");
-        if (!snap.exists()) throw new Error("Room not found!");
-        const room = snap.val();
-        const players = room.players || {};
-        const count = Object.keys(players).length;
-        if (!players[me.uid]) {
-          if (room.status !== "waiting" || count >= room.maxPlayers) {
-            throw new Error("Room is full or already started.");
-          }
-          const colors = room.maxPlayers === 2 ? COLOR_ORDER_2P : COLOR_ORDER_4P;
-          await db.ref("rooms/" + roomCode + "/players/" + me.uid).update(
-            Object.assign({}, me, { color: colors[count] || "blue", isHost: false })
-          );
-        }
-        return (await roomRef.once("value")).val();
-      }
-
-      async function findRandomMatch(maxPlayers, onMatched) {
-        const me = getMe();
-        if (!me) throw new Error("Sign in first.");
-        const queuePath = "matchmaking/" + maxPlayers + "p";
-        const queueRef = db.ref(queuePath);
-        const snap = await queueRef.once("value");
-
-        if (snap.exists()) {
-          const entries = snap.val();
-          const openKey = Object.keys(entries).find(function(k) {
-            return entries[k].uid !== me.uid && entries[k].status === "searching";
-          });
-          if (openKey) {
-            const roomCode = entries[openKey].roomId;
-            await db.ref(queuePath + "/" + openKey).update({ status: "matched" });
-            const joined = await joinRoomByCode(roomCode);
-            if (Object.keys(joined.players || {}).length >= maxPlayers) {
-              await db.ref("rooms/" + roomCode).update({ status: "playing" });
-            }
-            onMatched(joined);
-            return;
-          }
-        }
-
-        const roomCode = generateRoomCode();
-        const payload = buildRoomPayload(roomCode, me, maxPlayers, false);
-        await db.ref("rooms/" + roomCode).set(payload);
-        const myNode = queueRef.push();
-        activeQueueRef = myNode;
-        await myNode.set({
-          uid: me.uid,
-          name: me.name,
-          roomId: roomCode,
-          status: "searching",
-          createdAt: Date.now()
+          }, { passive: false });
         });
-        onMatched(payload);
       }
 
-      function renderWaitingRoomModal(roomData) {
-        window.activeOnlineRoom = roomData;
-        const players = Object.values(roomData.players || {});
-        const isHost = auth.currentUser && roomData.hostUid === auth.currentUser.uid;
-        const colorBadge = { red: "🔴", green: "🟢", yellow: "🟡", blue: "🔵" };
-
-        modalTitle.textContent = roomData.isPrivate ? "🏰 PRIVATE ROYAL ROOM" : "🌐 RANDOM ONLINE MATCH";
-        modalBody.innerHTML =
-          '<div class="room-code-banner">' +
-            '<div style="font-size:0.72rem;color:#cbd5e1;font-weight:700;">ROOM CODE (SHARE WITH FRIENDS)</div>' +
-            '<div style="font-size:1.55rem;font-weight:900;color:#facc15;letter-spacing:4px;margin:4px 0;">' + roomData.roomId + '</div>' +
-            '<button type="button" id="btn-copy-room-code" class="toggle-pill-btn">📋 Copy Code</button>' +
-          '</div>' +
-          '<div class="royal-section-title">Players Joined (' + players.length + '/' + roomData.maxPlayers + ')</div>' +
-          '<div class="slot-list">' +
-            players.map(function(p) {
-              return '<div class="slot-row"><div class="slot-color-info"><span>' + (colorBadge[p.color] || "🎲") + '</span><span>' + p.name + (p.isHost ? " 👑" : "") + '</span></div><span style="font-size:0.74rem;color:#4ade80;font-weight:800;">READY</span></div>';
-            }).join("") +
-          '</div>' +
-          '<div style="text-align:center;font-size:0.78rem;color:#94a3b8;margin-bottom:12px;">' +
-            (players.length < roomData.maxPlayers ? "⏳ Waiting for opponents to join..." : "✅ All players ready!") +
-          '</div>' +
-          (isHost ? '<button type="button" id="btn-start-online-now" class="golden-start-btn" style="margin-bottom:8px;">🚀 Start Match Now (' + players.length + 'P)</button>' : '') +
-          '<button type="button" id="btn-leave-online-room" class="golden-start-btn" style="background:linear-gradient(135deg,#334155,#1e293b);border-color:#64748b;color:#f8fafc;">← Leave Room</button>';
-        modalOverlay.classList.remove("hidden");
-
-        document.getElementById("btn-copy-room-code").onclick = function() {
-          if (navigator.clipboard) navigator.clipboard.writeText(roomData.roomId);
-          this.textContent = "✅ Copied!";
-        };
-
-        const startBtn = document.getElementById("btn-start-online-now");
-        if (startBtn) {
-          startBtn.onclick = async function() {
-            await db.ref("rooms/" + roomData.roomId).update({ status: "playing", startedAt: Date.now() });
-          };
-        }
-
-        document.getElementById("btn-leave-online-room").onclick = async function() {
-          if (activeQueueRef) { await activeQueueRef.remove().catch(function(){}); activeQueueRef = null; }
-          if (activeRoomRef) { activeRoomRef.off(); activeRoomRef = null; }
-          window.activeOnlineRoom = null;
-          modalOverlay.classList.add("hidden");
-        };
+      function showAuthNote(msg) {
+        if (statusEl) statusEl.textContent = msg;
       }
 
-      function attachRoomLiveListener(roomId) {
-        if (activeRoomRef) activeRoomRef.off();
-        activeRoomRef = db.ref("rooms/" + roomId);
-        activeRoomRef.on("value", function(snap) {
-          if (!snap.exists()) return;
-          const latestRoom = snap.val();
-          if (latestRoom.status === "playing") {
-            modalOverlay.classList.add("hidden");
-            document.getElementById("home-screen").classList.remove("active");
-            document.getElementById("game-hud").classList.add("active");
-            document.getElementById("match-mode-label").textContent = "🌐 Room: " + latestRoom.roomId;
+      if (googleBtn) {
+        googleBtn.addEventListener("click", function () {
+          if (typeof window.__royalLoginGoogle === "function") {
+            window.__royalLoginGoogle();
           } else {
-            renderWaitingRoomModal(latestRoom);
+            showAuthNote("Loading Google sign-in...");
           }
         });
       }
 
-      document.getElementById("btn-play-online").addEventListener("click", function(e) {
-        e.stopImmediatePropagation();
-        if (!auth.currentUser) { authOverlay.classList.remove("hidden"); return; }
-        modalTitle.textContent = "🌐 RANDOM ONLINE MATCH";
-        modalBody.innerHTML =
-          '<div class="royal-section-title">Select Random Match Format</div>' +
-          '<div class="quick-modes-grid">' +
-            '<button type="button" class="quick-mode-card" id="btn-rand-2p"><span>⚔️</span><span>1 vs 1 Random</span><span style="font-size:0.7rem;color:#facc15;">2 Players Live</span></button>' +
-            '<button type="button" class="quick-mode-card" id="btn-rand-4p"><span>👑</span><span>4-Player Royal</span><span style="font-size:0.7rem;color:#facc15;">4 Players Live</span></button>' +
-          '</div>' +
-          '<div id="online-match-status" style="text-align:center;font-size:0.8rem;color:#facc15;min-height:20px;"></div>';
-        modalOverlay.classList.remove("hidden");
-
-        const startSearch = async function(maxP) {
-          const st = document.getElementById("online-match-status");
-          if (st) st.textContent = "🔍 Searching " + maxP + "-Player Random Room...";
-          try {
-            await findRandomMatch(maxP, function(room) { attachRoomLiveListener(room.roomId); });
-          } catch (err) {
-            if (st) st.textContent = err.message || "Failed to join random match.";
+      if (fbBtn) {
+        fbBtn.addEventListener("click", function () {
+          if (typeof window.__royalLoginFacebook === "function") {
+            window.__royalLoginFacebook();
+          } else {
+            showAuthNote("Loading Facebook sign-in...");
           }
-        };
-        document.getElementById("btn-rand-2p").onclick = function() { startSearch(2); };
-        document.getElementById("btn-rand-4p").onclick = function() { startSearch(4); };
-      }, true);
+        });
+      }
 
-      document.getElementById("btn-private-room").addEventListener("click", function(e) {
-        e.stopImmediatePropagation();
-        if (!auth.currentUser) { authOverlay.classList.remove("hidden"); return; }
-        modalTitle.textContent = "🏰 PRIVATE ROOM (FRIENDS)";
-        modalBody.innerHTML =
-          '<div class="royal-section-title">Create New Private Room</div>' +
-          '<div class="quick-modes-grid">' +
-            '<button type="button" class="quick-mode-card" id="btn-create-priv-2p"><span>👥</span><span>Create 2P Room</span><span style="font-size:0.7rem;color:#4ade80;">Get Room Code</span></button>' +
-            '<button type="button" class="quick-mode-card" id="btn-create-priv-4p"><span>🏰</span><span>Create 4P Room</span><span style="font-size:0.7rem;color:#4ade80;">Get Room Code</span></button>' +
-          '</div>' +
-          '<div class="royal-section-title" style="margin-top:10px;">Or Join Friend\'s Room</div>' +
-          '<input type="text" id="input-priv-code" class="royal-input" maxlength="6" placeholder="ENTER CODE" />' +
-          '<button type="button" id="btn-join-priv-code" class="golden-start-btn">🔑 Join Private Room</button>' +
-          '<div id="priv-room-status" style="text-align:center;font-size:0.8rem;color:#fca5a5;margin-top:8px;min-height:18px;"></div>';
-        modalOverlay.classList.remove("hidden");
-
-        const handleCreate = async function(maxP) {
-          const st = document.getElementById("priv-room-status");
-          if (st) { st.style.color = "#facc15"; st.textContent = "Creating Private Room..."; }
-          try {
-            const room = await createPrivateRoom(maxP);
-            attachRoomLiveListener(room.roomId);
-          } catch (err) {
-            if (st) { st.style.color = "#fca5a5"; st.textContent = err.message || "Could not create room."; }
+      if (guestBtn) {
+        guestBtn.addEventListener("click", function () {
+          if (typeof window.__royalLoginGuest === "function") {
+            window.__royalLoginGuest();
+          } else {
+            showAuthNote("Loading Guest login...");
           }
-        };
-        document.getElementById("btn-create-priv-2p").onclick = function() { handleCreate(2); };
-        document.getElementById("btn-create-priv-4p").onclick = function() { handleCreate(4); };
-
-        document.getElementById("btn-join-priv-code").onclick = async function() {
-          const codeVal = document.getElementById("input-priv-code").value || "";
-          const st = document.getElementById("priv-room-status");
-          if (st) { st.style.color = "#facc15"; st.textContent = "Joining room..."; }
-          try {
-            const room = await joinRoomByCode(codeVal);
-            attachRoomLiveListener(room.roomId);
-          } catch (err) {
-            if (st) { st.style.color = "#fca5a5"; st.textContent = err.message || "Invalid Room Code."; }
-          }
-        };
-      }, true);
-
-      document.getElementById("btn-profile").addEventListener("click", function() {
-        modalTitle.textContent = "👑 ROYAL PLAYER PROFILE";
-        if (auth.currentUser && window.currentRoyalProfile) {
-          const p = window.currentRoyalProfile;
-          modalBody.innerHTML =
-            '<div style="text-align:center;padding:8px 0 14px;">' +
-              '<div style="font-size:2.4rem;margin-bottom:6px;">👑</div>' +
-              '<div style="font-size:1.1rem;font-weight:900;color:#facc15;">' + p.name + '</div>' +
-              '<div style="font-size:0.78rem;color:#94a3b8;margin-top:2px;">ID: ' + p.uid.slice(0, 10) + '...</div>' +
-            '</div>' +
-            '<button id="btn-do-logout" class="golden-start-btn" style="background:linear-gradient(135deg,#ef4444,#b91c1c);border-color:#fca5a5;color:#fff;">Sign Out / Switch Account</button>';
-          modalOverlay.classList.remove("hidden");
-          document.getElementById("btn-do-logout").onclick = async function() {
-            await auth.signOut();
-            modalOverlay.classList.add("hidden");
-            authOverlay.classList.remove("hidden");
-          };
-        } else {
-          modalOverlay.classList.add("hidden");
-          authOverlay.classList.remove("hidden");
-        }
-      });
+        });
+      }
     })();
   </script>
-</body>
-</html>
+
+  <script type="module">
+    import { auth } from "./js/firebase-config.js";
+    import {
+      loginWithGoogle,
+      loginWithFacebook,
+      loginAsGuest,
+      logoutPlayer,
+      watchAuthState
+    } from "./js/auth-profile.js";
+    import {
+      createPrivateRoom,
+      joinPrivateRoom,
+      findOnlineMatch,
+      subscribeToRoom,
+      startOnlineRoomMatch,
+      leaveOnlineRoom
+    } from "./js/online-room.js";
+
+    const authOverlay = document.getElementById("auth-gate-overlay");
+    const statusMsg = document.getElementById("auth-status-msg");
+    const modalOverlay = document.getElementById("modal-overlay");
+    const modalTitle = document.getElementById("modal-title");
+    const modalBody = document.getElementById("modal-body");
+
+    function hideAuthOverlay() {
+      if (authOverlay) {
+        authOverlay.classList.add("hidden");
+        authOverlay.style.display = "none";
+      }
+    }
+
+    async function runAuth(fn, label) {
+      if (statusMsg) statusMsg.textContent = `Signing in with ${label}...`;
+      try {
+        await fn();
+        if (statusMsg) statusMsg.textContent = "";
+      } catch (err) {
+        if (statusMsg) statusMsg.textContent = err?.message || `${label} sign-in failed.`;
+      }
+    }
+
+    window.__royalLoginGoogle = () => runAuth(loginWithGoogle, "Google");
+    window.__royalLoginFacebook = () => runAuth(loginWithFacebook, "Facebook");
+    window.__royalLoginGuest = () => runAuth(loginAsGuest, "Guest");
+
+    watchAuthState((user, profile) => {
+      window.currentRoyalUser = user;
+      window.currentRoyalProfile = profile;
+      if (user && profile) {
+        const nameEl = document.getElementById("display-name");
+        const lvlEl = document.getElementById("player-level-badge");
+        const coinEl = document.getElementById("coin-balance");
+        const box = document.getElementById("player-avatar-box");
+
+        if (nameEl) nameEl.textContent = profile.name || "Royal Player";
+        if (lvlEl) lvlEl.textContent = `Lvl ${profile.level || 1} • ${profile.isGuest ? "Guest" : "Verified"}`;
+        if (coinEl) coinEl.textContent = Number(profile.coins || 1000).toLocaleString();
+        if (box) box.innerHTML = profile.avatar ? `<img src="${profile.avatar}" alt="Avatar" />` : "👑";
+        hideAuthOverlay();
+      }
+    });
+
+    function renderWaitingRoom(roomData) {
+      window.activeOnlineRoom = roomData;
+      const players = Object.values(roomData.players || {});
+      const isHost = auth.currentUser && roomData.hostUid === auth.currentUser.uid;
+      const badge = { red: "🔴", green: "🟢", yellow: "🟡", blue: "🔵" };
+
+      modalTitle.textContent = roomData.isPrivate ? "🏰 PRIVATE ROYAL ROOM" : "🌐 RANDOM ONLINE MATCH";
+      modalBody.innerHTML = `
+        <div class="room-code-banner">
+          <div style="font-size:0.72rem;color:#cbd5e1;font-weight:700;">ROOM CODE</div>
+          <div style="font-size:1.55rem;font-weight:900;color:#facc15;letter-spacing:4px;margin:4px 0;">${roomData.roomId}</div>
+          <button type="button" id="btn-copy-code" class="toggle-pill-btn on">📋 Copy Code</button>
+        </div>
+        <div class="royal-section-title">Players (${players.length}/${roomData.maxPlayers})</div>
+        <div class="slot-list">
+          ${players.map((p) => `<div class="slot-row"><div class="slot-color-info"><span>${badge[p.color] || "🎲"}</span><span>${p.name}${p.isHost ? " 👑" : ""}</span></div><span style="font-size:0.74rem;color:#4ade80;font-weight:800;">READY</span></div>`).join("")}
+        </div>
+        ${isHost ? `<button type="button" id="btn-start-room" class="golden-start-btn" style="margin-bottom:8px;">🚀 Start Match (${players.length}P)</button>` : ""}
+        <button type="button" id="btn-leave-room" class="golden-start-btn" style="background:#1e293b;border-color:#64748b;color:#fff;">← Leave Room</button>
+      `;
+      modalOverlay.classList.remove("hidden");
+
+      document.getElementById("btn-copy-code").onclick = function () {
+        navigator.clipboard?.writeText(roomData.roomId);
+        this.textContent = "✅ Copied!";
+      };
+      if (isHost) {
+        document.getElementById("btn-start-room").onclick = () => startOnlineRoomMatch(roomData.roomId);
+      }
+      document.getElementById("btn-leave-room").onclick = async () => {
+        await leaveOnlineRoom();
+        window.activeOnlineRoom = null;
+        modalOverlay.classList.add("hidden");
+      
