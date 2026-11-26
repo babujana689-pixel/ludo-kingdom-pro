@@ -17,6 +17,8 @@ const COLOR_ORDER_4P = ["red", "green", "yellow", "blue"];
 let activeRoomId = null;
 let activeRoomRef = null;
 let activeQueueRef = null;
+let activeQueueKey = null;
+let activeQueuePath = null;
 
 // ৬-অক্ষরের প্রাইভেট রুম কোড জেনারেটর
 function generateRoomCode() {
@@ -28,7 +30,7 @@ function generateRoomCode() {
   return code;
 }
 
-// বর্তমান ইউজারের তথ্য সংগ্রহ
+// বর্তমান ইউজারের তথ্য সংগ্রহ (শুধুমাত্র সত্যিকারের প্রোফাইল তথ্য)
 function getCurrentPlayerInfo() {
   const user = auth.currentUser;
   const profile = window.currentRoyalProfile;
@@ -37,9 +39,19 @@ function getCurrentPlayerInfo() {
     uid: user.uid,
     name: profile?.name || user.displayName || `Player_${user.uid.slice(0, 5)}`,
     avatar: profile?.avatar || user.photoURL || "",
+    level: typeof profile?.level === "number" ? profile.level : null,
+    tier: typeof profile?.tier === "string" && profile.tier.trim() ? profile.tier.trim() : null,
     ready: true,
     joinedAt: Date.now()
   };
+}
+
+// রুমের প্লেয়ারদের সাজানো তালিকা তৈরি
+function getMatchedPlayersList(roomData) {
+  const playersObj = roomData?.players || {};
+  const list = Object.values(playersObj).filter((p) => p && p.uid);
+  list.sort((a, b) => (a.joinedAt || 0) - (b.joinedAt || 0));
+  return list;
 }
 
 // নতুন রুম অবজেক্ট তৈরি
@@ -56,7 +68,7 @@ function buildRoomPayload(roomId, hostPlayer, maxPlayers, isPrivate) {
     roomId,
     isPrivate,
     maxPlayers,
-    status: "waiting", // waiting | playing | finished
+    status: "waiting", // waiting | matched | playing | finished
     hostUid: hostPlayer.uid,
     turnColor: colors[0],
     lastDice: 0,
@@ -98,7 +110,7 @@ export async function joinPrivateRoom(roomCodeInput) {
   const currentCount = Object.keys(players).length;
 
   if (!players[me.uid]) {
-    if (room.status !== "waiting" || currentCount >= room.maxPlayers) {
+    if ((room.status !== "waiting" && room.status !== "matched") || currentCount >= room.maxPlayers) {
       throw new Error("This room is already full or in progress.");
     }
     const colors = room.maxPlayers === 2 ? COLOR_ORDER_2P : COLOR_ORDER_4P;
@@ -117,42 +129,106 @@ export async function joinPrivateRoom(roomCodeInput) {
   return updatedSnap.val();
 }
 
-// পাবলিক অনলাইন ম্যাচমেকিং (2P বা 4P)
-export async function findOnlineMatch(maxPlayers = 2, onMatched) {
-  const me = getCurrentPlayerInfo();
-  if (!me) throw new Error("Please sign in first (Google, Facebook, or Guest).");
+// ম্যাচমেকিং কিউ বা রুম বাতিল করা
+export async function cancelMatchmaking() {
+  await leaveOnlineRoom();
+}
 
-  const queuePath = `matchmaking/${maxPlayers}p`;
+// পাবলিক অনলাইন ম্যাচমেকিং (2P বা 4P — শুধুমাত্র সত্যিকারের প্লেয়ার ও State অনুযায়ী)
+export async function findOnlineMatch(maxPlayers = 2, callbacks = {}) {
+  const me = getCurrentPlayerInfo();
+  if (!me) {
+    throw new Error("Please sign in first (Google, Facebook, or Guest).");
+  }
+
+  const targetCount = maxPlayers === 4 ? 4 : 2;
+  let hasEmittedMatchFound = false;
+
+  // পূর্বের কোনো অসম্পূর্ণ কিউ বা লিসেনার থাকলে পরিষ্কার করা
+  await leaveOnlineRoom();
+
+  const queuePath = `matchmaking/${targetCount}p`;
   const queueRef = ref(db, queuePath);
   const snap = await get(queueRef);
+
+  const emitMatchFoundIfReady = async (roomData) => {
+    if (hasEmittedMatchFound || !roomData) return;
+    const matchedPlayers = getMatchedPlayersList(roomData);
+    if (matchedPlayers.length < targetCount) return;
+
+    hasEmittedMatchFound = true;
+
+    if (roomData.status === "waiting") {
+      await update(ref(db, `rooms/${roomData.roomId}`), {
+        status: "matched",
+        matchedAt: Date.now()
+      }).catch(() => {});
+    }
+
+    const matchPayload = {
+      ...roomData,
+      maxPlayers: targetCount,
+      matchedPlayers
+    };
+
+    if (typeof callbacks.onStatusChange === "function") {
+      callbacks.onStatusChange("matched", matchPayload);
+    }
+    if (typeof callbacks.onMatchFound === "function") {
+      callbacks.onMatchFound(matchPayload);
+    } else if (typeof callbacks.onMatched === "function") {
+      callbacks.onMatched(matchPayload);
+    }
+  };
 
   if (snap.exists()) {
     const entries = snap.val();
     const openKey = Object.keys(entries).find(
-      (k) => entries[k].uid !== me.uid && entries[k].status === "searching"
+      (k) =>
+        entries[k] &&
+        entries[k].uid !== me.uid &&
+        entries[k].status === "searching" &&
+        entries[k].roomId
     );
 
     if (openKey) {
       const target = entries[openKey];
       const roomCode = target.roomId;
-      await update(ref(db, `${queuePath}/${openKey}`), { status: "matched" });
+
+      await update(ref(db, `${queuePath}/${openKey}`), {
+        status: "matched",
+        matchedBy: me.uid
+      });
+
       const joinedRoom = await joinPrivateRoom(roomCode);
-      if (Object.keys(joinedRoom.players || {}).length >= maxPlayers) {
-        await update(ref(db, `rooms/${roomCode}`), { status: "playing" });
+      const currentPlayers = getMatchedPlayersList(joinedRoom);
+
+      if (currentPlayers.length >= targetCount) {
+        await update(ref(db, `rooms/${roomCode}`), {
+          status: "matched",
+          matchedAt: Date.now()
+        });
+        await emitMatchFoundIfReady({ ...joinedRoom, status: "matched" });
+        return {
+          ...joinedRoom,
+          maxPlayers: targetCount,
+          matchedPlayers: currentPlayers
+        };
       }
-      onMatched(joinedRoom);
-      return;
     }
   }
 
-  // কেউ অপেক্ষায় না থাকলে নতুন রুম খুলে কিউতে অপেক্ষা করা
+  // প্রয়োজনীয় সংখ্যক প্লেয়ার না পাওয়া গেলে নতুন রুম তৈরি করে 'searching' অবস্থায় কিউতে রাখা
   const roomCode = generateRoomCode();
   const roomRef = ref(db, `rooms/${roomCode}`);
-  const payload = buildRoomPayload(roomCode, me, maxPlayers, false);
+  const payload = buildRoomPayload(roomCode, me, targetCount, false);
   await set(roomRef, payload);
 
   const myQueueNode = push(queueRef);
   activeQueueRef = myQueueNode;
+  activeQueueKey = myQueueNode.key;
+  activeQueuePath = queuePath;
+
   await set(myQueueNode, {
     uid: me.uid,
     name: me.name,
@@ -163,7 +239,30 @@ export async function findOnlineMatch(maxPlayers = 2, onMatched) {
 
   activeRoomId = roomCode;
   activeRoomRef = roomRef;
-  onMatched(payload);
+
+  if (typeof callbacks.onStatusChange === "function") {
+    callbacks.onStatusChange("searching", {
+      ...payload,
+      matchedPlayers: getMatchedPlayersList(payload)
+    });
+  }
+
+  const handleRoomUpdate = async (roomSnap) => {
+    if (!roomSnap.exists()) return;
+    const roomData = roomSnap.val();
+    const matchedPlayers = getMatchedPlayersList(roomData);
+
+    if (matchedPlayers.length >= targetCount) {
+      if (activeQueueRef) {
+        await remove(activeQueueRef).catch(() => {});
+        activeQueueRef = null;
+      }
+      await emitMatchFoundIfReady(roomData);
+    }
+  };
+
+  onValue(roomRef, handleRoomUpdate);
+  return payload;
 }
 
 // রুমের রিয়েল-টাইম আপডেট শোনা
@@ -178,9 +277,19 @@ export function subscribeToRoom(roomId, callback) {
   });
 }
 
-// হোস্ট কর্তৃক ম্যাচ শুরু করা
+// ম্যাচ শুরু করা (কাউন্টডাউন শেষে বা অনুমোদিত অবস্থায়)
 export async function startOnlineRoomMatch(roomId) {
-  await update(ref(db, `rooms/${roomId}`), {
+  if (!roomId) return;
+  const roomRef = ref(db, `rooms/${roomId}`);
+  const snap = await get(roomRef);
+  if (!snap.exists()) return;
+
+  const roomData = snap.val();
+  const required = roomData.maxPlayers === 4 ? 4 : 2;
+  const playersCount = Object.keys(roomData.players || {}).length;
+  if (playersCount < required) return;
+
+  await update(roomRef, {
     status: "playing",
     startedAt: Date.now()
   });
@@ -199,10 +308,25 @@ export async function leaveOnlineRoom() {
   if (activeQueueRef) {
     await remove(activeQueueRef).catch(() => {});
     activeQueueRef = null;
+  } else if (activeQueuePath && activeQueueKey) {
+    await remove(ref(db, `${activeQueuePath}/${activeQueueKey}`)).catch(() => {});
   }
+  activeQueueKey = null;
+  activeQueuePath = null;
+
   if (activeRoomRef) {
     off(activeRoomRef);
     activeRoomRef = null;
   }
   activeRoomId = null;
 }
+
+window.LudoOnlineRoom = {
+  ...(window.LudoOnlineRoom || {}),
+  findOnlineMatch,
+  cancelMatchmaking,
+  leaveOnlineRoom,
+  subscribeToRoom,
+  startOnlineRoomMatch,
+  pushRoomMove
+};
