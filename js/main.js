@@ -503,20 +503,297 @@
       metaPills.push(`<span class="mf-meta-pill">${escapeHtml(player.tier)}</span>`);
     }
 
-    return `
-      <div class="mf-player-card">
-        <div class="mf-avatar-ring">
-          <div class="mf-avatar-inner">
-            ${avatarHtml}
+  let matchFoundCountdownTimer = null;
+  let matchFoundUnsubscribe = null;
+  let matchFoundHasStarted = false;
+
+  function clearMatchFoundCountdown() {
+    if (matchFoundCountdownTimer) {
+      clearInterval(matchFoundCountdownTimer);
+      matchFoundCountdownTimer = null;
+    }
+    if (typeof matchFoundUnsubscribe === "function") {
+      matchFoundUnsubscribe();
+      matchFoundUnsubscribe = null;
+    }
+    matchFoundHasStarted = false;
+  }
+
+  function escapeRoyalHtml(str) {
+    return String(str ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function normalizeRoyalColor(rawColor, idx = 0, maxPlayers = 2) {
+    const allowed = maxPlayers === 4
+      ? ["red", "green", "yellow", "blue"]
+      : ["red", "yellow"];
+    const c = String(rawColor || "").toLowerCase().trim();
+    if (["red", "green", "yellow", "blue"].includes(c)) return c;
+    return allowed[idx] || "red";
+  }
+
+  function render3DAvatarMarkup(player, colorKey) {
+    const avatarUrl = typeof player?.avatar === "string" ? player.avatar.trim() : "";
+    const crownBadge = player?.isHost
+      ? `<span class="mf-avatar-3d-crown" aria-hidden="true">👑</span>`
+      : "";
+
+    if (avatarUrl) {
+      return `
+        <div class="mf-avatar-3d-wrap">
+          ${crownBadge}
+          <div class="mf-avatar-ring">
+            <div class="mf-avatar-inner">
+              <img src="${escapeRoyalHtml(avatarUrl)}" alt="${escapeRoyalHtml(player?.name || "Player")}" referrerpolicy="no-referrer" />
+            </div>
           </div>
         </div>
-        <div class="mf-player-name" title="${safeName}">${safeName}</div>
-        ${metaPills.length ? `<div class="mf-player-meta">${metaPills.join("")}</div>` : ""}
+      `;
+    }
+
+    return `
+      <div class="mf-avatar-3d-wrap">
+        ${crownBadge}
+        <div class="mf-avatar-ring">
+          <div class="mf-avatar-inner" data-crest-color="${escapeRoyalHtml(colorKey)}">
+            <span class="mf-avatar-crest" aria-hidden="true">
+              <svg viewBox="0 0 48 48" fill="none">
+                <path d="M24 5L38 11V23C38 32.5 31.8 40.4 24 43C16.2 40.4 10 32.5 10 23V11L24 5Z" fill="currentColor" fill-opacity="0.22" stroke="currentColor" stroke-width="2.4"/>
+                <path d="M15 28L17.5 18L24 23L30.5 18L33 28H15Z" fill="#fde047" stroke="#fef08a" stroke-width="1.3" stroke-linejoin="round"/>
+                <circle cx="24" cy="33" r="2.6" fill="#fffbeb"/>
+              </svg>
+            </span>
+          </div>
+        </div>
       </div>
     `;
   }
 
-  function showMatchFoundScreen(matchData, modeLabel, modeKey, onComplete) {
+  function renderMatchFoundPlayerCard(player, index, maxPlayers) {
+    const colorKey = normalizeRoyalColor(player?.color, index, maxPlayers);
+    const colorLabel = colorKey.toUpperCase();
+    const safeName = escapeRoyalHtml(player?.name || "Player");
+    const isReady = Boolean(player?.ready);
+    const levelText = typeof player?.level === "number" && player.level > 0
+      ? `LVL ${player.level}`
+      : (player?.tier ? escapeRoyalHtml(player.tier) : "");
+
+    return `
+      <div class="mf-player-card ${isReady ? "is-ready" : ""}" data-color="${escapeRoyalHtml(colorKey)}">
+        ${render3DAvatarMarkup(player, colorKey)}
+        <div class="mf-player-name">${safeName}</div>
+        <div class="mf-player-meta">
+          <span class="mf-meta-pill mf-color-pill" data-player-color="${escapeRoyalHtml(colorKey)}">${escapeRoyalHtml(colorLabel)}</span>
+          ${levelText ? `<span class="mf-meta-pill">${levelText}</span>` : ""}
+          <span class="mf-ready-tag ${isReady ? "ready-yes" : ""}">${isReady ? "READY" : "WAITING"}</span>
+        </div>
+      </div>
+    `;
+  }
+
+  function showMatchFoundScreen(matchData, modeLabel, selectedMode, onComplete) {
+    clearMatchFoundCountdown();
+
+    const maxPlayers = matchData?.maxPlayers === 4 || selectedMode === "online-4p" ? 4 : 2;
+    const rawPlayers = Array.isArray(matchData?.matchedPlayers)
+      ? matchData.matchedPlayers
+      : Object.values(matchData?.players || {}).filter((p) => p && p.uid);
+    let players = rawPlayers.slice(0, maxPlayers);
+
+    if (players.length < maxPlayers) return;
+
+    const currentUid = window.auth?.currentUser?.uid || null;
+    const totalSeconds = 5;
+    let secondsLeft = totalSeconds;
+    let countdownStarted = false;
+
+    const modalHeader = document.querySelector(".modal-header, .royal-modal-header, #modal-header");
+    const closeBtn = document.getElementById("btn-close-modal");
+    if (modalHeader) modalHeader.style.display = "none";
+    if (closeBtn) closeBtn.style.display = "none";
+
+    const buildArenaMarkup = (list) => {
+      if (maxPlayers === 4) {
+        const topTwo = list.slice(0, 2);
+        const bottomTwo = list.slice(2, 4);
+        return `
+          <div class="mf-arena-4p">
+            <div class="mf-grid-4p">
+              ${topTwo.map((p, idx) => renderMatchFoundPlayerCard(p, idx, 4)).join("")}
+            </div>
+            <div class="mf-vs-badge" aria-label="VS">VS</div>
+            <div class="mf-grid-4p">
+              ${bottomTwo.map((p, idx) => renderMatchFoundPlayerCard(p, idx + 2, 4)).join("")}
+            </div>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="mf-arena-2p">
+          ${renderMatchFoundPlayerCard(list[0], 0, 2)}
+          <div class="mf-vs-badge" aria-label="VS">VS</div>
+          ${renderMatchFoundPlayerCard(list[1], 1, 2)}
+        </div>
+      `;
+    };
+
+    const triggerStartMatch = async () => {
+      if (matchFoundHasStarted) return;
+      matchFoundHasStarted = true;
+      if (matchFoundCountdownTimer) {
+        clearInterval(matchFoundCountdownTimer);
+        matchFoundCountdownTimer = null;
+      }
+      if (typeof matchFoundUnsubscribe === "function") {
+        matchFoundUnsubscribe();
+        matchFoundUnsubscribe = null;
+      }
+      if (modalHeader) modalHeader.style.display = "";
+      if (closeBtn) closeBtn.style.display = "";
+
+      if (matchData?.roomId && window.LudoOnlineRoom && typeof window.LudoOnlineRoom.startOnlineRoomMatch === "function") {
+        await window.LudoOnlineRoom.startOnlineRoomMatch(matchData.roomId).catch(() => {});
+      }
+
+      if (typeof onComplete === "function") {
+        onComplete({
+          ...matchData,
+          maxPlayers,
+          matchedPlayers: players
+        });
+      }
+    };
+
+    const updateReadyAndTimerState = () => {
+      const readyCount = players.filter((p) => Boolean(p?.ready)).length;
+      const allReady = players.length >= maxPlayers && readyCount === maxPlayers;
+
+      const me = currentUid ? players.find((p) => p.uid === currentUid) : null;
+      const iAmReady = Boolean(me?.ready);
+
+      const readyBtn = document.getElementById("mf-ready-btn");
+      const readySummary = document.getElementById("mf-ready-summary");
+      const labelEl = document.getElementById("mf-countdown-label");
+      const timerEl = document.getElementById("mf-countdown-value");
+      const barEl = document.getElementById("mf-countdown-bar");
+
+      if (readyBtn) {
+        readyBtn.disabled = !currentUid;
+        readyBtn.classList.toggle("is-ready-state", iAmReady);
+        readyBtn.textContent = iAmReady ? "✓ READY" : "READY";
+      }
+
+      if (readySummary) {
+        readySummary.textContent = allReady
+          ? `All ${maxPlayers}/${maxPlayers} players ready! Starting match...`
+          : `Ready players: ${readyCount}/${maxPlayers}`;
+      }
+
+      if (allReady && !countdownStarted) {
+        countdownStarted = true;
+        secondsLeft = totalSeconds;
+        if (labelEl) labelEl.textContent = "ALL PLAYERS READY — STARTING IN";
+        if (timerEl) timerEl.textContent = `${secondsLeft}s`;
+        if (barEl) barEl.style.width = "100%";
+
+        matchFoundCountdownTimer = setInterval(() => {
+          secondsLeft -= 1;
+          const clamped = Math.max(0, secondsLeft);
+          if (timerEl) timerEl.textContent = `${clamped}s`;
+          if (barEl) {
+            const pct = Math.max(0, Math.min(100, (clamped / totalSeconds) * 100));
+            barEl.style.width = `${pct}%`;
+          }
+          if (secondsLeft <= 0) {
+            triggerStartMatch();
+          }
+        }, 1000);
+      } else if (!allReady) {
+        if (matchFoundCountdownTimer) {
+          clearInterval(matchFoundCountdownTimer);
+          matchFoundCountdownTimer = null;
+        }
+        countdownStarted = false;
+        secondsLeft = totalSeconds;
+        if (labelEl) labelEl.textContent = "WAITING FOR ALL PLAYERS TO BE READY";
+        if (timerEl) timerEl.textContent = `${totalSeconds}s`;
+        if (barEl) barEl.style.width = "100%";
+      }
+    };
+
+    const renderScreen = () => {
+      openModal(
+        "",
+        `
+        <div class="match-found-screen" id="match-found-screen">
+          <h2 class="mf-banner-title">MATCH FOUND!</h2>
+          <div class="mf-mode-badge">${escapeRoyalHtml(modeLabel || (maxPlayers === 4 ? "ONLINE 4P LIVE" : "ONLINE 2P LIVE"))}</div>
+          ${buildArenaMarkup(players)}
+          <div class="mf-ready-action-wrap">
+            <button type="button" class="mf-ready-btn" id="mf-ready-btn">READY</button>
+            <div class="mf-ready-summary" id="mf-ready-summary"></div>
+          </div>
+          <div class="mf-countdown-box">
+            <div class="mf-countdown-label" id="mf-countdown-label">WAITING FOR ALL PLAYERS TO BE READY</div>
+            <div class="mf-countdown-value" id="mf-countdown-value">${totalSeconds}s</div>
+            <div class="mf-countdown-track" aria-hidden="true">
+              <div class="mf-countdown-bar" id="mf-countdown-bar"></div>
+            </div>
+          </div>
+        </div>
+        `
+      );
+
+      const readyBtn = document.getElementById("mf-ready-btn");
+      if (readyBtn) {
+        readyBtn.addEventListener("click", async () => {
+          if (!currentUid || matchFoundHasStarted) return;
+          if (window.LudoSound) window.LudoSound.click();
+
+          const me = players.find((p) => p.uid === currentUid);
+          const nextReady = !Boolean(me?.ready);
+
+          players = players.map((p) => (p.uid === currentUid ? { ...p, ready: nextReady } : p));
+          renderScreen();
+
+          if (matchData?.roomId && window.LudoOnlineRoom && typeof window.LudoOnlineRoom.setPlayerReady === "function") {
+            await window.LudoOnlineRoom.setPlayerReady(matchData.roomId, nextReady).catch((err) => {
+              showToast(err?.message || "Unable to update ready status");
+            });
+          }
+        });
+      }
+
+      updateReadyAndTimerState();
+    };
+
+    renderScreen();
+
+    if (matchData?.roomId && window.LudoOnlineRoom && typeof window.LudoOnlineRoom.subscribeToRoom === "function") {
+      matchFoundUnsubscribe = window.LudoOnlineRoom.subscribeToRoom(matchData.roomId, (roomState) => {
+        if (matchFoundHasStarted || !roomState) return;
+        const updatedList = Array.isArray(roomState.matchedPlayers)
+          ? roomState.matchedPlayers.slice(0, maxPlayers)
+          : Object.values(roomState.players || {}).filter((p) => p && p.uid).slice(0, maxPlayers);
+
+        if (updatedList.length >= maxPlayers) {
+          players = updatedList;
+          renderScreen();
+        }
+
+        if (roomState.status === "playing") {
+          triggerStartMatch();
+        }
+      });
+    }
+  }
+
     const maxPlayers = matchData?.maxPlayers === 4 ? 4 : 2;
     const playersObj = matchData?.players || {};
     const matchedPlayers = Array.isArray(matchData?.matchedPlayers) && matchData.matchedPlayers.length
