@@ -19,6 +19,7 @@ let activeRoomRef = null;
 let activeQueueRef = null;
 let activeQueueKey = null;
 let activeQueuePath = null;
+const roomListeners = new Map();
 
 // ৬-অক্ষরের প্রাইভেট রুম কোড জেনারেটর
 function generateRoomCode() {
@@ -41,7 +42,7 @@ function getCurrentPlayerInfo() {
     avatar: profile?.avatar || user.photoURL || "",
     level: typeof profile?.level === "number" ? profile.level : null,
     tier: typeof profile?.tier === "string" && profile.tier.trim() ? profile.tier.trim() : null,
-    ready: true,
+    ready: false,
     joinedAt: Date.now()
   };
 }
@@ -61,6 +62,7 @@ function buildRoomPayload(roomId, hostPlayer, maxPlayers, isPrivate) {
   players[hostPlayer.uid] = {
     ...hostPlayer,
     color: colors[0],
+    ready: false,
     isHost: true
   };
 
@@ -119,6 +121,7 @@ export async function joinPrivateRoom(roomCodeInput) {
     await update(ref(db, `rooms/${roomCode}/players/${me.uid}`), {
       ...me,
       color: assignedColor,
+      ready: false,
       isHost: false
     });
   }
@@ -265,29 +268,59 @@ export async function findOnlineMatch(maxPlayers = 2, callbacks = {}) {
   return payload;
 }
 
-// রুমের রিয়েল-টাইম আপডেট শোনা
-export function subscribeToRoom(roomId, callback) {
-  const roomRef = ref(db, `rooms/${roomId}`);
-  activeRoomId = roomId;
-  activeRoomRef = roomRef;
-  onValue(roomRef, (snap) => {
-    if (snap.exists()) {
-      callback(snap.val());
-    }
+// প্লেয়ারের READY স্ট্যাটাস সার্ভারে আপডেট করা
+export async function setPlayerReady(roomId, isReady = true) {
+  const user = auth.currentUser;
+  const targetRoomId = roomId || activeRoomId;
+  if (!user || !targetRoomId) return;
+
+  await update(ref(db, `rooms/${targetRoomId}/players/${user.uid}`), {
+    ready: Boolean(isReady),
+    readyAt: Date.now()
   });
 }
 
-// ম্যাচ শুরু করা (কাউন্টডাউন শেষে বা অনুমোদিত অবস্থায়)
-export async function startOnlineRoomMatch(roomId) {
-  if (!roomId) return;
+// রুমের রিয়েল-টাইম আপডেট শোনা
+export function subscribeToRoom(roomId, callback) {
+  if (!roomId || typeof callback !== "function") return () => {};
   const roomRef = ref(db, `rooms/${roomId}`);
+  activeRoomId = roomId;
+  activeRoomRef = roomRef;
+
+  const listener = (snap) => {
+    if (snap.exists()) {
+      const val = snap.val();
+      callback({
+        ...val,
+        matchedPlayers: getMatchedPlayersList(val)
+      });
+    }
+  };
+
+  onValue(roomRef, listener);
+  roomListeners.set(roomId, { roomRef, listener });
+
+  return () => {
+    off(roomRef, "value", listener);
+    roomListeners.delete(roomId);
+  };
+}
+
+// ম্যাচ শুরু করা (সব প্লেয়ার Ready ও কাউন্টডাউন শেষে)
+export async function startOnlineRoomMatch(roomId) {
+  const targetRoomId = roomId || activeRoomId;
+  if (!targetRoomId) return;
+  const roomRef = ref(db, `rooms/${targetRoomId}`);
   const snap = await get(roomRef);
   if (!snap.exists()) return;
 
   const roomData = snap.val();
   const required = roomData.maxPlayers === 4 ? 4 : 2;
-  const playersCount = Object.keys(roomData.players || {}).length;
-  if (playersCount < required) return;
+  const playersList = getMatchedPlayersList(roomData);
+  if (playersList.length < required) return;
+
+  const allReady = playersList.every((p) => Boolean(p.ready));
+  if (!allReady) return;
 
   await update(roomRef, {
     status: "playing",
@@ -314,6 +347,11 @@ export async function leaveOnlineRoom() {
   activeQueueKey = null;
   activeQueuePath = null;
 
+  roomListeners.forEach(({ roomRef, listener }) => {
+    off(roomRef, "value", listener);
+  });
+  roomListeners.clear();
+
   if (activeRoomRef) {
     off(activeRoomRef);
     activeRoomRef = null;
@@ -326,6 +364,7 @@ window.LudoOnlineRoom = {
   findOnlineMatch,
   cancelMatchmaking,
   leaveOnlineRoom,
+  setPlayerReady,
   subscribeToRoom,
   startOnlineRoomMatch,
   pushRoomMove
