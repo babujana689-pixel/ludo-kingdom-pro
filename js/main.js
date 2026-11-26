@@ -450,8 +450,17 @@
   const modalOverlay = document.getElementById("modal-overlay");
   const modalTitle = document.getElementById("modal-title");
   const modalBody = document.getElementById("modal-body");
+  let activeMatchFoundTimer = null;
+
+  function clearMatchFoundCountdown() {
+    if (activeMatchFoundTimer) {
+      clearInterval(activeMatchFoundTimer);
+      activeMatchFoundTimer = null;
+    }
+  }
 
   function openModal(title, html) {
+    clearMatchFoundCountdown();
     if (window.LudoSound) window.LudoSound.click();
     modalTitle.textContent = title;
     modalBody.innerHTML = html;
@@ -459,6 +468,7 @@
   }
 
   function closeModal(skipMusicRestore = false) {
+    clearMatchFoundCountdown();
     modalOverlay.classList.add("hidden");
     if (!skipMusicRestore && window.LudoSound) {
       if (isBoardActive) window.LudoSound.playBoardMusic();
@@ -466,6 +476,113 @@
     }
   }
 
+  function escapeHtml(text) {
+    return String(text || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function renderMatchFoundPlayerCard(player, index) {
+    const safeName = escapeHtml(player.name || `Player ${index + 1}`);
+    const initial = safeName.charAt(0).toUpperCase() || "P";
+    const hasAvatar = typeof player.avatar === "string" && player.avatar.trim().length > 0;
+    const avatarHtml = hasAvatar
+      ? `<img src="${escapeHtml(player.avatar)}" alt="${safeName}" referrerpolicy="no-referrer" />`
+      : `<span>${escapeHtml(initial)}</span>`;
+
+    const metaPills = [];
+    if (player.color) {
+      metaPills.push(`<span class="mf-meta-pill">${escapeHtml(String(player.color).toUpperCase())}</span>`);
+    }
+    if (typeof player.level === "number") {
+      metaPills.push(`<span class="mf-meta-pill">LVL ${player.level}</span>`);
+    }
+    if (player.tier) {
+      metaPills.push(`<span class="mf-meta-pill">${escapeHtml(player.tier)}</span>`);
+    }
+
+    return `
+      <div class="mf-player-card">
+        <div class="mf-avatar-ring">
+          <div class="mf-avatar-inner">
+            ${avatarHtml}
+          </div>
+        </div>
+        <div class="mf-player-name" title="${safeName}">${safeName}</div>
+        ${metaPills.length ? `<div class="mf-player-meta">${metaPills.join("")}</div>` : ""}
+      </div>
+    `;
+  }
+
+  function showMatchFoundScreen(matchData, modeLabel, modeKey, onComplete) {
+    const maxPlayers = matchData?.maxPlayers === 4 ? 4 : 2;
+    const playersObj = matchData?.players || {};
+    const matchedPlayers = Array.isArray(matchData?.matchedPlayers) && matchData.matchedPlayers.length
+      ? matchData.matchedPlayers.slice(0, maxPlayers)
+      : Object.values(playersObj)
+          .filter((p) => p && p.uid)
+          .sort((a, b) => (a.joinedAt || 0) - (b.joinedAt || 0))
+          .slice(0, maxPlayers);
+
+    if (matchedPlayers.length < maxPlayers) return;
+
+    const cardsHtml = matchedPlayers.map((p, idx) => renderMatchFoundPlayerCard(p, idx)).join("");
+    const arenaHtml = maxPlayers === 4
+      ? `
+        <div class="mf-arena-4p">
+          <div class="mf-grid-4p">${cardsHtml}</div>
+          <div class="mf-vs-badge" aria-hidden="true">VS</div>
+        </div>
+      `
+      : `
+        <div class="mf-arena-2p">
+          ${renderMatchFoundPlayerCard(matchedPlayers[0], 0)}
+          <div class="mf-vs-badge" aria-hidden="true">VS</div>
+          ${renderMatchFoundPlayerCard(matchedPlayers[1], 1)}
+        </div>
+      `;
+
+    let secondsLeft = 5;
+
+    openModal(
+      "🏆 MATCH FOUND!",
+      `
+      <div class="match-found-screen">
+        <h2 class="mf-banner-title">MATCH FOUND!</h2>
+        <div class="mf-mode-badge">${escapeHtml(modeLabel)}</div>
+        ${arenaHtml}
+        <div class="mf-countdown-box">
+          <div class="mf-countdown-label">Match Starting Automatically</div>
+          <div class="mf-countdown-value" id="mf-countdown-timer">${secondsLeft}s</div>
+        </div>
+      </div>
+      `
+    );
+
+    const timerEl = document.getElementById("mf-countdown-timer");
+    clearMatchFoundCountdown();
+
+    activeMatchFoundTimer = setInterval(async () => {
+      secondsLeft -= 1;
+      if (timerEl) {
+        timerEl.textContent = `${Math.max(0, secondsLeft)}s`;
+      }
+
+      if (secondsLeft <= 0) {
+        clearMatchFoundCountdown();
+        if (window.LudoOnlineRoom && typeof window.LudoOnlineRoom.startOnlineRoomMatch === "function" && matchData?.roomId) {
+          await window.LudoOnlineRoom.startOnlineRoomMatch(matchData.roomId).catch(() => {});
+        }
+        if (typeof onComplete === "function") {
+          onComplete(matchData);
+        }
+      }
+    }, 1000);
+  }
+
+  document.getElementById("btn-close-modal").addEventListener("click", () => {
   document.getElementById("btn-close-modal").addEventListener("click", () => {
     if (window.LudoSound) window.LudoSound.click();
     closeModal(false);
@@ -699,11 +816,166 @@
   });
 
   document.getElementById("btn-play-online").addEventListener("click", () => {
-    openModal("🌐 Online Matchmaking", `
-      <p style="color:#cbd5e1;font-size:0.85rem;line-height:1.5;">
-        <b>Random Match</b> & <b>Public Random Rooms</b> connect in <b>Phase 2</b>.
-      </p>
-    `);
+    if (window.LudoSound) window.LudoSound.click();
+    openModal(
+      "🌐 Online Matchmaking",
+      `
+      <div class="royal-section-title">SELECT MATCH FORMAT</div>
+      <div class="pro-match-grid" id="online-mode-select">
+        <button type="button" class="pro-format-card active" data-mode="online-2p">
+          <span>⚔️</span>
+          <strong>2 Players Live</strong>
+          <small>1v1 Duel Arena</small>
+        </button>
+        <button type="button" class="pro-format-card" data-mode="online-4p">
+          <span>👑</span>
+          <strong>4 Players Live</strong>
+          <small>Royal 4-Player Table</small>
+        </button>
+      </div>
+      <div class="pro-status-note">
+        Real-time matchmaking queue with live opponents only.
+      </div>
+      <button type="button" class="pro-cta-btn" id="btn-start-online-match">
+        🚀 FIND MATCH
+      </button>
+    `
+    );
+
+    let selectedOnlineMode = "online-2p";
+    modalBody.querySelectorAll("#online-mode-select .pro-format-card").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (window.LudoSound) window.LudoSound.click();
+        modalBody.querySelectorAll("#online-mode-select .pro-format-card").forEach((b) => {
+          b.classList.remove("active");
+        });
+        btn.classList.add("active");
+        selectedOnlineMode = btn.dataset.mode;
+      });
+    });
+
+    const startOnlineBtn = document.getElementById("btn-start-online-match");
+    if (startOnlineBtn) {
+      startOnlineBtn.addEventListener("click", async () => {
+        if (window.LudoSound) window.LudoSound.click();
+        const maxPlayers = selectedOnlineMode === "online-4p" ? 4 : 2;
+        const label = maxPlayers === 4 ? "Online 4P Live" : "Online 2P Live";
+
+        openModal(
+          "🔍 Finding Match",
+          `
+          <div class="pro-search-box">
+            <div class="pro-search-loader-wrap" aria-hidden="true">
+              <div class="pro-search-orbit"></div>
+              <div class="pro-search-spinner"></div>
+              <div class="pro-search-core-dot"></div>
+            </div>
+            <div class="pro-search-status" id="pro-search-status-text">
+              Searching for ${maxPlayers} Players match...
+            </div>
+            <div class="pro-loading-dots" aria-hidden="true">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <button type="button" class="pro-cancel-btn" id="btn-cancel-matchmaking">
+              ✕ Cancel
+            </button>
+          </div>
+          `
+        );
+
+        let isCancelled = false;
+        let isMatchFound = false;
+
+        const cancelBtn = document.getElementById("btn-cancel-matchmaking");
+        const statusEl = document.getElementById("pro-search-status-text");
+
+        const closeCurrentModal = () => {
+          if (typeof closeModal === "function") {
+            closeModal(false);
+          } else {
+            clearMatchFoundCountdown();
+            const activeModal = document.querySelector(".modal.active, .royal-modal.active, #modal-overlay.active");
+            if (activeModal) activeModal.classList.remove("active");
+          }
+        };
+
+        if (cancelBtn) {
+          cancelBtn.addEventListener("click", async () => {
+            if (isMatchFound) return;
+            isCancelled = true;
+            if (window.LudoSound) window.LudoSound.click();
+            if (statusEl) statusEl.textContent = "Cancelling search...";
+            if (window.LudoOnlineRoom) {
+              if (typeof window.LudoOnlineRoom.cancelMatchmaking === "function") {
+                await window.LudoOnlineRoom.cancelMatchmaking().catch(() => {});
+              } else if (typeof window.LudoOnlineRoom.leaveOnlineRoom === "function") {
+                await window.LudoOnlineRoom.leaveOnlineRoom().catch(() => {});
+              }
+            }
+            closeCurrentModal();
+            showToast("Matchmaking cancelled.");
+          });
+        }
+
+        const handleRealMatchFound = (matchData) => {
+          if (isCancelled || isMatchFound) return;
+          const playersList = Array.isArray(matchData?.matchedPlayers)
+            ? matchData.matchedPlayers
+            : Object.values(matchData?.players || {}).filter((p) => p && p.uid);
+
+          if (playersList.length < maxPlayers) return;
+          isMatchFound = true;
+
+          showMatchFoundScreen(
+            {
+              ...matchData,
+              maxPlayers,
+              matchedPlayers: playersList.slice(0, maxPlayers)
+            },
+            label,
+            selectedOnlineMode,
+            (confirmedMatch) => {
+              if (isCancelled) return;
+              closeCurrentModal();
+              enter3DBoard(label, {
+                mode: selectedOnlineMode,
+                roomId: confirmedMatch?.roomId || null,
+                online: true
+              });
+              showToast("🌐 Match Started — " + label + "!");
+            }
+          );
+        };
+
+        try {
+          if (window.LudoOnlineRoom && typeof window.LudoOnlineRoom.findOnlineMatch === "function") {
+            await window.LudoOnlineRoom.findOnlineMatch(maxPlayers, {
+              onStatusChange: (state, info) => {
+                if (isCancelled || isMatchFound || !statusEl) return;
+                if (state === "searching") {
+                  const currentCount = Array.isArray(info?.matchedPlayers) ? info.matchedPlayers.length : 1;
+                  statusEl.textContent = `Searching for ${maxPlayers} Players match (${currentCount}/${maxPlayers} joined)...`;
+                } else if (state === "matched") {
+                  handleRealMatchFound(info);
+                }
+              },
+              onMatchFound: handleRealMatchFound,
+              onMatched: handleRealMatchFound
+            });
+          } else if (statusEl) {
+            statusEl.textContent = "Online matchmaking service is not connected.";
+          }
+        } catch (err) {
+          if (isCancelled) return;
+          if (statusEl) {
+            statusEl.textContent = err?.message || "Unable to start matchmaking.";
+          }
+          showToast(err?.message || "Matchmaking error");
+        }
+      });
+    }
   });
 
   document.getElementById("btn-private-room").addEventListener("click", () => {
@@ -765,7 +1037,10 @@
     renderer.render(scene, camera);
   }
   animate();
-  const playerProfile = getActivePlayerProfile();
-const profileBannerHtml = renderOnlineProfileBanner(playerProfile);
 
+  if (typeof getActivePlayerProfile === "function" && typeof renderOnlineProfileBanner === "function") {
+    const playerProfile = getActivePlayerProfile();
+    const profileBannerHtml = renderOnlineProfileBanner(playerProfile);
+  }
 })();
+      
