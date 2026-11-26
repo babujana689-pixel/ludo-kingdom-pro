@@ -277,3 +277,247 @@ html, body {
 #game-hud button {
   pointer-events: auto !important;
 }
+.royal-section-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  color: #facc15;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.pro-match-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.pro-format-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 14px 10px;
+  border-radius: 14px;
+  border: 1.5px solid rgba(250, 204, 21, 0.25);
+  background: rgba(15, 23, 42, 0.92);
+  color: #f8fafc;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pro-format-card.active {
+  border-color: #facc15;
+  background: linear-gradient(145deg, rgba(250, 204, 21, 0.2), rgba(30, 41, 59, 0.95));
+  box-shadow: 0 0 18px rgba(250, 204, 21, 0.25);
+  transform: translateY(-2px);
+}
+
+.pro-card-icon {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.pro-card-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.pro-card-sub {
+  font-size: 0.72rem;
+  color: #cbd5e1;
+}
+
+.pro-status-note {
+  font-size: 0.78rem;
+  color: #cbd5e1;
+  text-align: center;
+  margin-bottom: 14px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.pro-cta-btn {
+  width: 100%;
+  padding: 13px 16px;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.92rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  color: #0f172a;
+  background: linear-gradient(135deg, #fde047, #eab308);
+  box-shadow: 0 6px 20px rgba(234, 179, 8, 0.35);
+  cursor: pointer;
+}
+.royal-section-title {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+  color: #facc15;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.pro-match-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.pro-format-card {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 15px 10px;
+  border-radius: 16px;
+  border: 1.5px solid rgba(250, 204, 21, 0.22);
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(9, 13, 24, 0.98));
+  color: #f8fafc;
+  cursor: pointer;
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.pro-format-card.active {
+  border-color: #fde047;
+  background: linear-gradient(160deg, rgba(250, 204, 21, 0.22), rgba(15, 23, 42, 0.98));
+  box-shadow: 0 0 22px rgba(250, 204, 21, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.pro-card-icon {
+  font-size: 1.45rem;
+  line-height: 1.1;
+}
+
+.pro-card-title {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.2px;
+}
+
+.pro-card-sub {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-style: normal;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #94a3b8;
+}
+
+.pro-format-card.active .pro-card-sub {
+  color: #fde68a;
+}
+
+.pro-status-note {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-style: normal;
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: #cbd5e1;
+  text-align: center;
+  margin-bottom: 14px;
+  padding: 9px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background: rgba(15, 23, 42, 0.72);
+}
+
+.pro-cta-btn {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid rgba(254, 240, 138, 0.65);
+  border-radius: 14px;
+  font-size: 0.92rem;
+  font-weight: 900;
+  letter-spacing: 0.9px;
+  color: #090d16;
+  background: linear-gradient(135deg, #fef08a 0%, #facc15 55%, #eab308 100%);
+  box-shadow: 0 8px 24px rgba(234, 179, 8, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+}
+.royal-section-title {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 1.6px;
+  color: #facc15;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.pro-match-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.pro-format-card {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 16px 10px;
+  border-radius: 16px;
+  border: 1.5px solid rgba(250, 204, 21, 0.22);
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(9, 13, 24, 0.98));
+  color: #f8fafc;
+  cursor: pointer;
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.pro-format-card.active {
+  border-color: #fde047;
+  background: linear-gradient(160deg, rgba(250, 204, 21, 0.22), rgba(15, 23, 42, 0.98));
+  box-shadow: 0 0 22px rgba(250, 204, 21, 0.28);
+  transform: translateY(-2px);
+}
+
+.pro-card-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.pro-card-title {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.pro-card-badge {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(250, 204, 21, 0.14);
+  color: #fde047;
+}
+
+.pro-cta-btn {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid rgba(254, 240, 138, 0.65);
+  border-radius: 14px;
+  font-size: 0.92rem;
+  font-weight: 900;
+  letter-spacing: 0.9px;
+  color: #090d16;
+  background: linear-gradient(135deg, #fef08a 0%, #facc15 55%, #eab308 100%);
+  box-shadow: 0 8px 24px rgba(234, 179, 8, 0.35);
+  cursor: pointer;
+}
