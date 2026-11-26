@@ -482,7 +482,8 @@
       }
 
       const startBtn = document.getElementById("btn-start-room");
-      if (startBtn && isHost) {Id);
+      if (startBtn && isHost) {
+        startBtn.onclick = () => startOnlineRoomMatch(roomData.roomId);
       }
 
       const leaveBtn = document.getElementById("btn-leave-room");
