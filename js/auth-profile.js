@@ -30,6 +30,7 @@ async function ensurePlayerProfile(user) {
       avatar: user.photoURL || "",
       coins: 1000,
       gems: 25,
+      xp: 0,
       level: 1,
       wins: 0,
       isGuest: user.isAnonymous || false,
@@ -71,8 +72,12 @@ export async function loginWithFacebook() {
 }
 
 export async function loginAsGuest() {
-  const res = await signInAnonymously(auth);
-  return await ensurePlayerProfile(res.user);
+  try {
+    const res = await signInAnonymously(auth);
+    return await ensurePlayerProfile(res.user);
+  } catch (err) {
+    throw err;
+  }
 }
 
 export async function logoutPlayer() {
