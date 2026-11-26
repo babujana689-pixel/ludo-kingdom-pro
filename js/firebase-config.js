@@ -7,17 +7,17 @@ import {
 import { getDatabase } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyB-LX_SEe3GXWjF3C-AjTu7NHLMYWesIF4",
+  authDomain: "ludo-kingdom-pro.firebaseapp.com",
+  databaseURL: "https://ludo-kingdom-pro-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "ludo-kingdom-pro",
+  storageBucket: "ludo-kingdom-pro.firebasestorage.app",
+  messagingSenderId: "497347829715",
+  appId: "1:497347829715:web:887eeb636ca2857739d926",
+  measurementId: "G-HDF5KWTM4K"
 };
 
 const app = initializeApp(firebaseConfig);
-
 export const auth = getAuth(app);
 export const db = getDatabase(app);
 export const googleProvider = new GoogleAuthProvider();
