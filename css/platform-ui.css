@@ -1,1590 +1,371 @@
-/* Top Header Bar */
-.top-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.profile-chip {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-gold);
-  border-radius: 999px;
-  padding: 5px 14px 5px 6px;
-  color: var(--text-main);
-  backdrop-filter: blur(10px);
-}
-
-.avatar-ring {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--gold-main), var(--gold-dark));
-  display: grid;
-  place-items: center;
-  font-size: 1.2rem;
-}
-
-.profile-meta {
-  display: flex;
-  flex-direction: column;
-  text-align: left;
-}
-
-.player-name {
-  font-size: 0.82rem;
-  font-weight: 600;
-  line-height: 1.1;
-}
-
-.player-rank {
-  font-size: 0.68rem;
-  color: var(--gold-light);
-}
-
-.currency-group {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.currency-pill {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  background: var(--bg-card);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 0.78rem;
-  font-weight: 600;
-}
-
-.icon-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 1px solid var(--border-gold);
-  background: var(--bg-card);
-  color: var(--text-main);
-  font-size: 1rem;
-  display: grid;
-  place-items: center;
-}
-
-/* Side Quick Dock */
-.side-dock {
-  position: fixed;
-  right: 12px;
-  top: 72px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  z-index: 15;
-}
-
-.dock-btn {
-  position: relative;
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-gold);
-  color: var(--text-main);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
-}
-
-.dock-icon {
-  font-size: 1.15rem;
-}
-
-.dock-label {
-  font-size: 0.62rem;
-  color: var(--gold-light);
-}
-
-.badge-dot {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--crimson);
-}
-
-/* Center Royal Title */
-.hero-center {
-  text-align: center;
-  margin-top: 8px;
-  pointer-events: none;
-}
-
-.crown-badge {
-  display: inline-block;
-  font-size: 0.68rem;
-  letter-spacing: 2px;
-  color: var(--gold-light);
-  background: rgba(245, 185, 66, 0.14);
-  border: 1px solid var(--border-gold);
-  padding: 3px 12px;
-  border-radius: 999px;
-  margin-bottom: 6px;
-}
-
-.game-logo {
-  font-family: 'Cinzel', serif;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  line-height: 1;
-  text-shadow: 0 6px 24px rgba(0, 0, 0, 0.85);
-}
-
-.logo-3d {
-  font-size: 1.5rem;
-  font-weight: 900;
-  color: var(--gold-main);
-  letter-spacing: 4px;
-}
-
-.logo-main {
-  font-size: clamp(1.75rem, 7vw, 2.5rem);
-  font-weight: 900;
-  background: linear-gradient(180deg, #ffffff 10%, var(--gold-light) 55%, var(--gold-main) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.tagline {
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  margin-top: 4px;
-}
-
-/* Bottom Action Panel */
-.action-panel {
-  width: 100%;
-  max-width: 440px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.btn-primary-hero {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 14px 18px;
-  border-radius: 18px;
-  border: 1px solid #ffe082;
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  color: #111827;
-  text-align: left;
-  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.35);
-  transition: transform 0.12s ease;
-}
-
-.btn-primary-hero:active,
-.btn-card:active,
-.nav-item:active,
-.dock-btn:active {
-  transform: scale(0.96);
-}
-
-.btn-icon {
-  font-size: 2rem;
-}
-
-.btn-text {
-  display: flex;
-  flex-direction: column;
-}
-
-.btn-text strong {
-  font-size: 1.02rem;
-  font-weight: 800;
-}
-
-.btn-text small {
-  font-size: 0.74rem;
-  font-weight: 500;
-  opacity: 0.9;
-}
-
-.action-grid-2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-.btn-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 13px 10px;
-  border-radius: 16px;
-  color: var(--text-main);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  backdrop-filter: blur(10px);
-}
-
-.btn-card.online {
-  background: linear-gradient(145deg, rgba(16, 185, 129, 0.28), rgba(6, 78, 59, 0.65));
-  border-color: rgba(16, 185, 129, 0.5);
-}
-
-.btn-card.private {
-  background: linear-gradient(145deg, rgba(59, 130, 246, 0.28), rgba(30, 58, 138, 0.65));
-  border-color: rgba(59, 130, 246, 0.5);
-}
-
-.card-icon {
-  font-size: 1.5rem;
-  margin-bottom: 3px;
-}
-
-.btn-card strong {
-  font-size: 0.9rem;
-}
-
-.btn-card small {
-  font-size: 0.68rem;
-  color: var(--text-muted);
-}
-
-/* Bottom Navigation Bar */
-.bottom-nav {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-gold);
-  border-radius: 16px;
-  padding: 6px;
-  backdrop-filter: blur(12px);
-}
-
-.nav-item {
-  background: transparent;
-  border: none;
-  color: var(--text-main);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding: 6px 2px;
-  border-radius: 10px;
-  font-size: 0.68rem;
-}
-
-.nav-item span:first-child {
-  font-size: 1.15rem;
-}
-
-/* Modals */
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  background: rgba(4, 7, 17, 0.78);
-  backdrop-filter: blur(6px);
-  display: grid;
-  place-items: center;
-  padding: 16px;
-}
-
-.modal-card {
-  width: 100%;
-  max-width: 400px;
-  background: var(--bg-card-solid);
-  border: 1px solid var(--border-gold);
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: var(--shadow-glow);
-}
-
-.modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 18px;
-  background: rgba(245, 185, 66, 0.08);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.modal-header h2 {
-  font-size: 1rem;
-  color: var(--gold-light);
-}
-
-.close-modal {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  font-size: 1.6rem;
-  line-height: 1;
-}
-
-.modal-body {
-  padding: 16px 18px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.field-label {
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  font-weight: 500;
-}
-
-.segmented-control {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(85px, 1fr));
-  gap: 6px;
-}
-
-.seg-btn {
-  padding: 9px 8px;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--text-main);
-  font-size: 0.76rem;
-  font-weight: 600;
-}
-
-.seg-btn.active {
-  background: rgba(245, 185, 66, 0.22);
-  border-color: var(--gold-main);
-  color: var(--gold-light);
-}
-
-.seat-preview-list {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.seat-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 12px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.05);
-  font-size: 0.8rem;
-}
-
-.btn-action-full {
-  width: 100%;
-  padding: 13px;
-  border-radius: 12px;
-  border: none;
-  font-weight: 700;
-  font-size: 0.9rem;
-  letter-spacing: 0.5px;
-}
-
-.btn-action-full.gold {
-  background: linear-gradient(135deg, var(--gold-main), var(--gold-dark));
-  color: #0f172a;
-}
-
-.btn-action-full.emerald {
-  background: linear-gradient(135deg, #10b981, #059669);
-  color: #ffffff;
-}
-
-.info-banner {
-  background: rgba(59, 130, 246, 0.15);
-  border: 1px solid rgba(59, 130, 246, 0.4);
-  padding: 10px 12px;
-  border-radius: 10px;
-  font-size: 0.78rem;
-  line-height: 1.4;
-}
-
-.divider-text {
-  text-align: center;
-  font-size: 0.7rem;
-  color: var(--text-muted);
-}
-
-.join-row {
-  display: flex;
-  gap: 8px;
-}
-
-input[type="text"], select {
-  width: 100%;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: rgba(0, 0, 0, 0.35);
-  color: var(--text-main);
-  font-size: 0.88rem;
-}
-
-.btn-small {
-  padding: 0 18px;
-  border-radius: 10px;
-  border: none;
-  background: var(--royal-blue);
-  color: #fff;
-  font-weight: 700;
-}
-
-.avatar-picker {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.avatar-opt {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  border: 2px solid transparent;
-  background: rgba(255, 255, 255, 0.08);
-  font-size: 1.4rem;
-}
-
-.avatar-opt.active {
-  border-color: var(--gold-main);
-  background: rgba(245, 185, 66, 0.2);
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-}
-
-.stat-box {
-  background: rgba(255, 255, 255, 0.05);
-  padding: 10px 6px;
-  border-radius: 10px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-}
-
-.stat-box span {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-}
-
-.stat-box strong {
-  font-size: 1rem;
-  color: var(--gold-light);
-}
-
-.muted-note {
-  font-size: 0.76rem;
-  color: var(--text-muted);
-  text-align: center;
-}
-
-.list-container, .vip-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  list-style: none;
-  font-size: 0.82rem;
-}
-
-.rank-row, .quest-item, .setting-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 12px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.quest-item div {
-  display: flex;
-  flex-direction: column;
-}
-
-.quest-item small {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-}
-
-.quest-reward {
-  color: var(--gold-light);
-  font-weight: 700;
-  font-size: 0.8rem;
-}
-
-.skin-grid, .daily-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-.skin-card, .day-box {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 12px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.8rem;
-}
-
-.skin-card.equipped, .day-box.active {
-  border-color: var(--gold-main);
-  background: rgba(245, 185, 66, 0.14);
-}
-
-.skin-icon {
-  font-size: 1.8rem;
-}
-
-.tag-free {
-  font-size: 0.7rem;
-  color: var(--emerald);
-  font-weight: 600;
-}
-
-.tag-price {
-  font-size: 0.74rem;
-  color: var(--gold-light);
-  font-weight: 600;
-}
-/* Quick Mode সিলেক্ট হলে উজ্জ্বল গোল্ডেন গ্লো ও পপ অ্যানিমেশন */
-.quick-mode-card {
-  transition: transform 0.18s ease, box-shadow 0.22s ease, border-color 0.22s ease, background 0.22s ease;
-}
-
-.quick-mode-card:active {
-  transform: scale(0.96);
-}
-
-.quick-mode-card.selected-preset {
-  border-color: #facc15 !important;
-  background: linear-gradient(145deg, rgba(250, 204, 21, 0.26), rgba(30, 58, 138, 0.55)) !important;
-  box-shadow: 0 0 18px rgba(250, 204, 21, 0.55), inset 0 0 10px rgba(254, 240, 138, 0.3) !important;
-  transform: translateY(-2px) scale(1.02);
-  animation: royalPulse 1.4s infinite alternate;
-}
-
-/* Human / AI / OFF পিল সিলেক্ট হলে উজ্জ্বল আলো ও অ্যানিমেশন */
-.role-pill {
-  transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease;
-}
-
-.role-pill:active {
-  transform: scale(0.92);
-}
-
-.role-pill.active {
-  background: linear-gradient(135deg, #facc15, #f59e0b) !important;
-  color: #070b19 !important;
-  font-weight: 700 !important;
-  box-shadow: 0 0 14px rgba(250, 204, 21, 0.75) !important;
-  transform: scale(1.06);
-}
-
-/* START GAME বাটনে হালকা শাইন অ্যানিমেশন */
-.golden-start-btn {
-  transition: transform 0.16s ease, box-shadow 0.22s ease;
-  box-shadow: 0 4px 20px rgba(245, 158, 11, 0.45);
-}
-
-.golden-start-btn:active {
-  transform: scale(0.97);
-}
-
-@keyframes royalPulse {
-  from {
-    box-shadow: 0 0 12px rgba(250, 204, 21, 0.4);
+// Online Matchmaking & Private Room Controller for Ludo Kingdom Pro
+import { auth, db } from "./firebase-config.js";
+import {
+  ref,
+  get,
+  set,
+  update,
+  remove,
+  onValue,
+  off,
+  push
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const COLOR_ORDER_2P = ["red", "yellow"];
+const COLOR_ORDER_4P = ["red", "green", "yellow", "blue"];
+
+let activeRoomId = null;
+let activeRoomRef = null;
+let activeQueueRef = null;
+let activeQueueKey = null;
+let activeQueuePath = null;
+const roomListeners = new Map();
+
+// ৬-অক্ষরের প্রাইভেট রুম কোড জেনারেটর
+function generateRoomCode() {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let code = "";
+  for (let i = 0; i < 6; i++) {
+    code += chars[Math.floor(Math.random() * chars.length)];
   }
-  to {
-    box-shadow: 0 0 22px rgba(250, 204, 21, 0.8);
-  }
-}
-/* ===== Home Screen Class Alignment Fix ===== */
-.profile-pill {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: rgba(11, 18, 38, 0.88);
-  border: 1.5px solid rgba(250, 204, 21, 0.45);
-  border-radius: 999px;
-  padding: 5px 14px 5px 6px;
-  color: #f8fafc;
-  cursor: pointer;
+  return code;
 }
 
-.profile-info {
-  display: flex;
-  flex-direction: column;
-  text-align: left;
+// বর্তমান ইউজারের তথ্য সংগ্রহ (শুধুমাত্র সত্যিকারের প্রোফাইল তথ্য)
+function getCurrentPlayerInfo() {
+  const user = auth.currentUser;
+  const profile = window.currentRoyalProfile;
+  if (!user) return null;
+  return {
+    uid: user.uid,
+    name: profile?.name || user.displayName || `Player_${user.uid.slice(0, 5)}`,
+    avatar: profile?.avatar || user.photoURL || "",
+    level: typeof profile?.level === "number" ? profile.level : null,
+    tier: typeof profile?.tier === "string" && profile.tier.trim() ? profile.tier.trim() : null,
+    ready: false,
+    joinedAt: Date.now()
+  };
 }
 
-.player-level {
-  font-size: 0.68rem;
-  color: #fde047;
-  font-weight: 600;
+// রুমের প্লেয়ারদের সাজানো তালিকা তৈরি
+function getMatchedPlayersList(roomData) {
+  const playersObj = roomData?.players || {};
+  const list = Object.values(playersObj).filter((p) => p && p.uid);
+  list.sort((a, b) => (a.joinedAt || 0) - (b.joinedAt || 0));
+  return list;
 }
 
-/* ডান পাশের Side Dock বাটন */
-.dock-item {
-  position: relative;
-  width: 54px;
-  height: 54px;
-  border-radius: 14px;
-  background: linear-gradient(160deg, rgba(17, 29, 62, 0.94), rgba(8, 13, 32, 0.96));
-  border: 1px solid rgba(250, 204, 21, 0.45);
-  color: #f8fafc;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
-  cursor: pointer;
+// নতুন রুম অবজেক্ট তৈরি
+function buildRoomPayload(roomId, hostPlayer, maxPlayers, isPrivate) {
+  const colors = maxPlayers === 2 ? COLOR_ORDER_2P : COLOR_ORDER_4P;
+  const players = {};
+  players[hostPlayer.uid] = {
+    ...hostPlayer,
+    color: colors[0],
+    ready: false,
+    isHost: true
+  };
+
+  return {
+    roomId,
+    isPrivate,
+    maxPlayers,
+    status: "waiting", // waiting | matched | playing | finished
+    hostUid: hostPlayer.uid,
+    turnColor: colors[0],
+    lastDice: 0,
+    lastMove: null,
+    createdAt: Date.now(),
+    players
+  };
 }
 
-.dock-badge {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #ef4444;
+// প্রাইভেট রুম তৈরি করা
+export async function createPrivateRoom(maxPlayers = 4) {
+  const me = getCurrentPlayerInfo();
+  if (!me) throw new Error("Please sign in first (Google, Facebook, or Guest).");
+
+  const roomCode = generateRoomCode();
+  const roomRef = ref(db, `rooms/${roomCode}`);
+  const payload = buildRoomPayload(roomCode, me, maxPlayers, true);
+  await set(roomRef, payload);
+
+  activeRoomId = roomCode;
+  activeRoomRef = roomRef;
+  return payload;
 }
 
-/* মাঝখানের Royal Title */
-.royal-badge {
-  display: inline-block;
-  font-size: 0.68rem;
-  letter-spacing: 2px;
-  color: #fde047;
-  background: rgba(250, 204, 21, 0.14);
-  border: 1px solid rgba(250, 204, 21, 0.45);
-  padding: 3px 12px;
-  border-radius: 999px;
-  margin-bottom: 6px;
-}
+// কোড দিয়ে প্রাইভেট রুমে জয়েন করা
+export async function joinPrivateRoom(roomCodeInput) {
+  const me = getCurrentPlayerInfo();
+  if (!me) throw new Error("Please sign in first (Google, Facebook, or Guest).");
 
-.game-title {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  line-height: 1.05;
-  margin: 0;
-  text-shadow: 0 6px 24px rgba(0, 0, 0, 0.85);
-}
+  const roomCode = roomCodeInput.trim().toUpperCase();
+  if (roomCode.length < 4) throw new Error("Enter a valid room code.");
 
-.title-main {
-  font-size: clamp(1.7rem, 7vw, 2.4rem);
-  font-weight: 900;
-  letter-spacing: 1px;
-  background: linear-gradient(180deg, #ffffff 10%, #fde047 55%, #f59e0b 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
+  const roomRef = ref(db, `rooms/${roomCode}`);
+  const snap = await get(roomRef);
+  if (!snap.exists()) throw new Error("Room not found! Check the code.");
 
-.title-3d {
-  font-size: 1.35rem;
-  font-weight: 900;
-  color: #facc15;
-  letter-spacing: 5px;
-}
+  const room = snap.val();
+  const players = room.players || {};
+  const currentCount = Object.keys(players).length;
 
-.game-subtitle {
-  font-size: 0.78rem;
-  color: #cbd5e1;
-  margin-top: 4px;
-}
+  if (!players[me.uid]) {
+    if ((room.status !== "waiting" && room.status !== "matched") || currentCount >= room.maxPlayers) {
+      throw new Error("This room is already full or in progress.");
+    }
+    const colors = room.maxPlayers === 2 ? COLOR_ORDER_2P : COLOR_ORDER_4P;
+    const assignedColor = colors[currentCount] || "blue";
 
-/* নিচের কন্ট্রোল ও Online / Private কার্ড */
-.bottom-controls {
-  width: 100%;
-  max-width: 440px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 0 12px 12px;
-  box-sizing: border-box;
-}
-
-.btn-hero-icon {
-  font-size: 2rem;
-}
-
-.btn-hero-text {
-  display: flex;
-  flex-direction: column;
-}
-
-.btn-hero-title {
-  font-size: 1rem;
-  font-weight: 900;
-  color: #070b19;
-}
-
-.btn-hero-sub {
-  font-size: 0.74rem;
-  font-weight: 600;
-  color: #1e293b;
-}
-
-.mode-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-.mode-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 13px 10px;
-  border-radius: 16px;
-  color: #f8fafc;
-  border: 1.5px solid rgba(250, 204, 21, 0.4);
-  background: linear-gradient(155deg, rgba(19, 32, 68, 0.92), rgba(10, 17, 38, 0.96));
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
-  cursor: pointer;
-}
-
-#btn-play-online {
-  background: linear-gradient(145deg, rgba(16, 185, 129, 0.28), rgba(6, 78, 59, 0.78));
-  border-color: rgba(52, 211, 153, 0.55);
-}
-
-#btn-private-room {
-  background: linear-gradient(145deg, rgba(59, 130, 246, 0.28), rgba(30, 58, 138, 0.78));
-  border-color: rgba(96, 165, 250, 0.55);
-}
-
-.mode-icon {
-  font-size: 1.55rem;
-  margin-bottom: 3px;
-}
-
-.mode-title {
-  font-size: 0.9rem;
-  font-weight: 800;
-}
-
-.mode-tag {
-  font-size: 0.68rem;
-  color: #cbd5e1;
-}
-
-/* নিচের 4-বাটনের নেভ বার */
-.nav-btn {
-  background: transparent;
-  border: none;
-  color: #f8fafc;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding: 6px 2px;
-  border-radius: 10px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  cursor: pointer;
-}
-.royal-section-title {
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 1.8px;
-  color: #facc15;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.75);
-  margin-bottom: 12px;
-  text-transform: uppercase;
-}
-
-.pro-match-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.pro-format-card {
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 16px 10px;
-  border-radius: 18px;
-  border: 1.5px solid rgba(250, 204, 21, 0.24);
-  border-bottom: 5px solid #050811;
-  background: linear-gradient(180deg, #1e293b 0%, #0f172a 55%, #090d16 100%);
-  color: #f8fafc;
-  box-shadow:
-    0 10px 18px rgba(0, 0, 0, 0.55),
-    inset 0 1.5px 1px rgba(255, 255, 255, 0.16);
-  cursor: pointer;
-  transition: transform 0.14s ease, border-color 0.14s ease, box-shadow 0.14s ease;
-}
-
-.pro-format-card:active {
-  transform: translateY(3px);
-  border-bottom-width: 2px;
-}
-
-.pro-format-card.active {
-  border-color: #fde047;
-  border-bottom: 5px solid #a16207;
-  background: linear-gradient(180deg, rgba(250, 204, 21, 0.28) 0%, #172033 55%, #0b101d 100%);
-  box-shadow:
-    0 12px 24px rgba(234, 179, 8, 0.28),
-    0 0 20px rgba(250, 204, 21, 0.2),
-    inset 0 1.5px 1px rgba(254, 249, 195, 0.35);
-  transform: translateY(-2px);
-}
-
-.pro-format-card.active:active {
-  transform: translateY(2px);
-  border-bottom-width: 2px;
-}
-
-.pro-card-icon {
-  font-size: 1.65rem;
-  line-height: 1;
-  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.65));
-}
-
-.pro-card-title {
-  font-size: 0.94rem;
-  font-weight: 800;
-  color: #ffffff;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
-}
-
-.pro-card-badge {
-  font-size: 0.68rem;
-  font-weight: 800;
-  letter-spacing: 0.8px;
-  padding: 2px 9px;
-  border-radius: 999px;
-  background: linear-gradient(180deg, rgba(250, 204, 21, 0.24), rgba(202, 138, 4, 0.14));
-  border: 1px solid rgba(250, 204, 21, 0.35);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 2px 4px rgba(0, 0, 0, 0.45);
-  color: #fde047;
-}
-
-.pro-cta-btn {
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  width: 100%;
-  padding: 14px 16px;
-  border: 1px solid rgba(254, 249, 195, 0.8);
-  border-bottom: 5px solid #854d0e;
-  border-radius: 16px;
-  font-size: 0.94rem;
-  font-weight: 900;
-  letter-spacing: 0.9px;
-  color: #090d16;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.45);
-  background: linear-gradient(180deg, #fef08a 0%, #facc15 55%, #eab308 100%);
-  box-shadow:
-    0 10px 22px rgba(234, 179, 8, 0.36),
-    inset 0 2px 1px rgba(255, 255, 255, 0.65);
-  cursor: pointer;
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
-}
-
-.pro-cta-btn:active {
-  transform: translateY(3px);
-  border-bottom-width: 2px;
-  box-shadow:
-    0 4px 12px rgba(234, 179, 8, 0.28),
-    inset 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-/* =========================================================
-   FINDING MATCH MODAL - ROYAL NAVY & GOLDEN POLISH
-   ========================================================= */
-.pro-search-box {
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  width: 100%;
-  max-width: 340px;
-  margin: 0 auto;
-  padding: 22px 16px 14px;
-  text-align: center;
-  background: radial-gradient(circle at top, rgba(250, 204, 21, 0.1), rgba(10, 17, 40, 0.92) 72%);
-  border: 1px solid rgba(250, 204, 21, 0.24);
-  border-radius: 18px;
-  box-shadow: inset 0 1px 0 rgba(254, 240, 138, 0.16), 0 12px 28px rgba(3, 7, 18, 0.55);
-  box-sizing: border-box;
-}
-
-.pro-search-loader-wrap {
-  position: relative;
-  width: 66px;
-  height: 66px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.pro-search-orbit {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  border: 2px dashed rgba(250, 204, 21, 0.35);
-  animation: proOrbitSlow 4.5s linear infinite;
-}
-
-.pro-search-spinner {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  border: 4px solid rgba(250, 204, 21, 0.18);
-  border-top-color: #facc15;
-  border-right-color: #fef08a;
-  box-shadow: 0 0 20px rgba(250, 204, 21, 0.36);
-  animation: proSpinRing 0.95s linear infinite;
-}
-
-.pro-search-core-dot {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #fde047;
-  box-shadow: 0 0 12px rgba(250, 204, 21, 0.9);
-  animation: proCorePulse 1.4s ease-in-out infinite;
-}
-
-.pro-search-status {
-  width: 100%;
-  font-size: 0.94rem;
-  font-weight: 700;
-  color: #f8fafc;
-  text-align: center;
-  line-height: 1.45;
-  letter-spacing: 0.2px;
-  word-break: break-word;
-}
-
-.pro-loading-dots {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  height: 16px;
-}
-
-.pro-loading-dots span {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #facc15;
-  box-shadow: 0 0 8px rgba(250, 204, 21, 0.65);
-  animation: proDotBounce 1.2s ease-in-out infinite;
-}
-
-.pro-loading-dots span:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.pro-loading-dots span:nth-child(3) {
-  animation-delay: 0.4s;
-}
-
-.pro-cancel-btn {
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  margin-top: 4px;
-  min-width: 156px;
-  max-width: 100%;
-  padding: 11px 24px;
-  border-radius: 13px;
-  border: 1.5px solid #fef08a;
-  border-bottom: 4px solid #92400e;
-  background: linear-gradient(180deg, #fde047 0%, #eab308 55%, #ca8a04 100%);
-  color: #091124;
-  font-size: 0.88rem;
-  font-weight: 900;
-  letter-spacing: 0.4px;
-  text-align: center;
-  box-shadow: 0 6px 18px rgba(234, 179, 8, 0.28);
-  cursor: pointer;
-  transition: transform 0.14s ease, box-shadow 0.14s ease, filter 0.14s ease;
-}
-
-.pro-cancel-btn:hover {
-  filter: brightness(1.05);
-  box-shadow: 0 8px 22px rgba(250, 204, 21, 0.42);
-}
-
-.pro-cancel-btn:active {
-  transform: translateY(2px);
-  border-bottom-width: 2px;
-}
-
-@keyframes proSpinRing {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes proOrbitSlow {
-  to {
-    transform: rotate(-360deg);
-  }
-}
-
-@keyframes proCorePulse {
-  0%, 100% {
-    transform: scale(0.82);
-    opacity: 0.65;
-  }
-  50% {
-    transform: scale(1.18);
-    opacity: 1;
-  }
-}
-
-@keyframes proDotBounce {
-  0%, 80%, 100% {
-    transform: translateY(0) scale(0.8);
-    opacity: 0.4;
-  }
-  40% {
-    transform: translateY(-5px) scale(1.15);
-    opacity: 1;
-  }
-}
-
-@media (max-width: 420px) {
-  .pro-search-box {
-    max-width: 100%;
-    padding: 18px 12px 12px;
-    gap: 14px;
-    border-radius: 16px;
+    await update(ref(db, `rooms/${roomCode}/players/${me.uid}`), {
+      ...me,
+      color: assignedColor,
+      ready: false,
+      isHost: false
+    });
   }
 
-  .pro-search-loader-wrap {
-    width: 58px;
-    height: 58px;
+  activeRoomId = roomCode;
+  activeRoomRef = roomRef;
+  const updatedSnap = await get(roomRef);
+  return updatedSnap.val();
+}
+
+// ম্যাচমেকিং কিউ বা রুম বাতিল করা
+export async function cancelMatchmaking() {
+  await leaveOnlineRoom();
+}
+
+// পাবলিক অনলাইন ম্যাচমেকিং (2P বা 4P — শুধুমাত্র সত্যিকারের প্লেয়ার ও State অনুযায়ী)
+export async function findOnlineMatch(maxPlayers = 2, callbacks = {}) {
+  const me = getCurrentPlayerInfo();
+  if (!me) {
+    throw new Error("Please sign in first (Google, Facebook, or Guest).");
   }
 
-  .pro-search-spinner {
-    width: 46px;
-    height: 46px;
+  const targetCount = maxPlayers === 4 ? 4 : 2;
+  let hasEmittedMatchFound = false;
+
+  // পূর্বের কোনো অসম্পূর্ণ কিউ বা লিসেনার থাকলে পরিষ্কার করা
+  await leaveOnlineRoom();
+
+  const queuePath = `matchmaking/${targetCount}p`;
+  const queueRef = ref(db, queuePath);
+  const snap = await get(queueRef);
+
+  const emitMatchFoundIfReady = async (roomData) => {
+    if (hasEmittedMatchFound || !roomData) return;
+    const matchedPlayers = getMatchedPlayersList(roomData);
+    if (matchedPlayers.length < targetCount) return;
+
+    hasEmittedMatchFound = true;
+
+    if (roomData.status === "waiting") {
+      await update(ref(db, `rooms/${roomData.roomId}`), {
+        status: "matched",
+        matchedAt: Date.now()
+      }).catch(() => {});
+    }
+
+    const matchPayload = {
+      ...roomData,
+      maxPlayers: targetCount,
+      matchedPlayers
+    };
+
+    if (typeof callbacks.onStatusChange === "function") {
+      callbacks.onStatusChange("matched", matchPayload);
+    }
+    if (typeof callbacks.onMatchFound === "function") {
+      callbacks.onMatchFound(matchPayload);
+    } else if (typeof callbacks.onMatched === "function") {
+      callbacks.onMatched(matchPayload);
+    }
+  };
+
+  if (snap.exists()) {
+    const entries = snap.val();
+    const openKey = Object.keys(entries).find(
+      (k) =>
+        entries[k] &&
+        entries[k].uid !== me.uid &&
+        entries[k].status === "searching" &&
+        entries[k].roomId
+    );
+
+    if (openKey) {
+      const target = entries[openKey];
+      const roomCode = target.roomId;
+
+      await update(ref(db, `${queuePath}/${openKey}`), {
+        status: "matched",
+        matchedBy: me.uid
+      });
+
+      const joinedRoom = await joinPrivateRoom(roomCode);
+      const currentPlayers = getMatchedPlayersList(joinedRoom);
+
+      if (currentPlayers.length >= targetCount) {
+        await update(ref(db, `rooms/${roomCode}`), {
+          status: "matched",
+          matchedAt: Date.now()
+        });
+        await emitMatchFoundIfReady({ ...joinedRoom, status: "matched" });
+        return {
+          ...joinedRoom,
+          maxPlayers: targetCount,
+          matchedPlayers: currentPlayers
+        };
+      }
+    }
   }
 
-  .pro-search-status {
-    font-size: 0.88rem;
+  // প্রয়োজনীয় সংখ্যক প্লেয়ার না পাওয়া গেলে নতুন রুম তৈরি করে 'searching' অবস্থায় কিউতে রাখা
+  const roomCode = generateRoomCode();
+  const roomRef = ref(db, `rooms/${roomCode}`);
+  const payload = buildRoomPayload(roomCode, me, targetCount, false);
+  await set(roomRef, payload);
+
+  const myQueueNode = push(queueRef);
+  activeQueueRef = myQueueNode;
+  activeQueueKey = myQueueNode.key;
+  activeQueuePath = queuePath;
+
+  await set(myQueueNode, {
+    uid: me.uid,
+    name: me.name,
+    roomId: roomCode,
+    status: "searching",
+    createdAt: Date.now()
+  });
+
+  activeRoomId = roomCode;
+  activeRoomRef = roomRef;
+
+  if (typeof callbacks.onStatusChange === "function") {
+    callbacks.onStatusChange("searching", {
+      ...payload,
+      matchedPlayers: getMatchedPlayersList(payload)
+    });
   }
 
-  .pro-cancel-btn {
-    width: 100%;
-    max-width: 220px;
-    padding: 11px 18px;
-    font-size: 0.84rem;
+  const handleRoomUpdate = async (roomSnap) => {
+    if (!roomSnap.exists()) return;
+    const roomData = roomSnap.val();
+    const matchedPlayers = getMatchedPlayersList(roomData);
+
+    if (matchedPlayers.length >= targetCount) {
+      if (activeQueueRef) {
+        await remove(activeQueueRef).catch(() => {});
+        activeQueueRef = null;
+      }
+      await emitMatchFoundIfReady(roomData);
+    }
+  };
+
+  onValue(roomRef, handleRoomUpdate);
+  return payload;
+}
+
+// প্লেয়ারের READY স্ট্যাটাস সার্ভারে আপডেট করা
+export async function setPlayerReady(roomId, isReady = true) {
+  const user = auth.currentUser;
+  const targetRoomId = roomId || activeRoomId;
+  if (!user || !targetRoomId) return;
+
+  await update(ref(db, `rooms/${targetRoomId}/players/${user.uid}`), {
+    ready: Boolean(isReady),
+    readyAt: Date.now()
+  });
+}
+
+// রুমের রিয়েল-টাইম আপডেট শোনা
+export function subscribeToRoom(roomId, callback) {
+  if (!roomId || typeof callback !== "function") return () => {};
+  const roomRef = ref(db, `rooms/${roomId}`);
+  activeRoomId = roomId;
+  activeRoomRef = roomRef;
+
+  const listener = (snap) => {
+    if (snap.exists()) {
+      const val = snap.val();
+      callback({
+        ...val,
+        matchedPlayers: getMatchedPlayersList(val)
+      });
+    }
+  };
+
+  onValue(roomRef, listener);
+  roomListeners.set(roomId, { roomRef, listener });
+
+  return () => {
+    off(roomRef, "value", listener);
+    roomListeners.delete(roomId);
+  };
+}
+
+// ম্যাচ শুরু করা (সব প্লেয়ার Ready ও কাউন্টডাউন শেষে)
+export async function startOnlineRoomMatch(roomId) {
+  const targetRoomId = roomId || activeRoomId;
+  if (!targetRoomId) return;
+  const roomRef = ref(db, `rooms/${targetRoomId}`);
+  const snap = await get(roomRef);
+  if (!snap.exists()) return;
+
+  const roomData = snap.val();
+  const required = roomData.maxPlayers === 4 ? 4 : 2;
+  const playersList = getMatchedPlayersList(roomData);
+  if (playersList.length < required) return;
+
+  const allReady = playersList.every((p) => Boolean(p.ready));
+  if (!allReady) return;
+
+  await update(roomRef, {
+    status: "playing",
+    startedAt: Date.now()
+  });
+}
+
+// ছক্কা ও চালের তথ্য সার্ভারে পাঠানো
+export async function pushRoomMove(roomId, moveData) {
+  await update(ref(db, `rooms/${roomId}`), {
+    ...moveData,
+    updatedAt: Date.now()
+  });
+}
+
+// রুম বা ম্যাচমেকিং ছেড়ে বের হওয়া
+export async function leaveOnlineRoom() {
+  if (activeQueueRef) {
+    await remove(activeQueueRef).catch(() => {});
+    activeQueueRef = null;
+  } else if (activeQueuePath && activeQueueKey) {
+    await remove(ref(db, `${activeQueuePath}/${activeQueueKey}`)).catch(() => {});
   }
-}
-/* =========================================================
-   FINDING MATCH & MATCH FOUND - ROYAL NAVY & GOLDEN THEME
-   ========================================================= */
-.pro-search-box {
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  width: 100%;
-  max-width: 340px;
-  margin: 0 auto;
-  padding: 22px 16px 14px;
-  text-align: center;
-  background: radial-gradient(circle at top, rgba(250, 204, 21, 0.1), rgba(10, 17, 40, 0.92) 72%);
-  border: 1px solid rgba(250, 204, 21, 0.24);
-  border-radius: 18px;
-  box-shadow: inset 0 1px 0 rgba(254, 240, 138, 0.16), 0 12px 28px rgba(3, 7, 18, 0.55);
-  box-sizing: border-box;
-}
+  activeQueueKey = null;
+  activeQueuePath = null;
 
-.pro-search-loader-wrap {
-  position: relative;
-  width: 66px;
-  height: 66px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+  roomListeners.forEach(({ roomRef, listener }) => {
+    off(roomRef, "value", listener);
+  });
+  roomListeners.clear();
 
-.pro-search-orbit {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  border: 2px dashed rgba(250, 204, 21, 0.35);
-  animation: proOrbitSlow 4.5s linear infinite;
-}
-
-.pro-search-spinner {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  border: 4px solid rgba(250, 204, 21, 0.18);
-  border-top-color: #facc15;
-  border-right-color: #fef08a;
-  box-shadow: 0 0 20px rgba(250, 204, 21, 0.36);
-  animation: proSpinRing 0.95s linear infinite;
-}
-
-.pro-search-core-dot {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #fde047;
-  box-shadow: 0 0 12px rgba(250, 204, 21, 0.9);
-  animation: proCorePulse 1.4s ease-in-out infinite;
-}
-
-.pro-search-status {
-  width: 100%;
-  font-size: 0.94rem;
-  font-weight: 700;
-  color: #f8fafc;
-  text-align: center;
-  line-height: 1.45;
-  letter-spacing: 0.2px;
-  word-break: break-word;
-}
-
-.pro-loading-dots {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  height: 16px;
-}
-
-.pro-loading-dots span {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #facc15;
-  box-shadow: 0 0 8px rgba(250, 204, 21, 0.65);
-  animation: proDotBounce 1.2s ease-in-out infinite;
-}
-
-.pro-loading-dots span:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.pro-loading-dots span:nth-child(3) {
-  animation-delay: 0.4s;
-}
-
-.pro-cancel-btn {
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  margin-top: 4px;
-  min-width: 156px;
-  max-width: 100%;
-  padding: 11px 24px;
-  border-radius: 13px;
-  border: 1.5px solid #fef08a;
-  border-bottom: 4px solid #92400e;
-  background: linear-gradient(180deg, #fde047 0%, #eab308 55%, #ca8a04 100%);
-  color: #091124;
-  font-size: 0.88rem;
-  font-weight: 900;
-  letter-spacing: 0.4px;
-  text-align: center;
-  box-shadow: 0 6px 18px rgba(234, 179, 8, 0.28);
-  cursor: pointer;
-  transition: transform 0.14s ease, box-shadow 0.14s ease, filter 0.14s ease;
-}
-
-.pro-cancel-btn:hover {
-  filter: brightness(1.05);
-  box-shadow: 0 8px 22px rgba(250, 204, 21, 0.42);
-}
-
-.pro-cancel-btn:active {
-  transform: translateY(2px);
-  border-bottom-width: 2px;
-}
-
-/* =========================================================
-   MATCH FOUND SCREEN - ROYAL NAVY BLUE & GOLDEN YELLOW
-   ========================================================= */
-.match-found-screen {
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  width: 100%;
-  max-width: 540px;
-  margin: 0 auto;
-  padding: 18px 14px 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  color: #f8fafc;
-  background: radial-gradient(circle at 50% 0%, rgba(250, 204, 21, 0.16), rgba(7, 15, 38, 0.96) 68%);
-  border: 1.5px solid rgba(250, 204, 21, 0.42);
-  border-radius: 20px;
-  box-shadow: 0 18px 42px rgba(2, 6, 23, 0.78), inset 0 1px 0 rgba(254, 240, 138, 0.28);
-  box-sizing: border-box;
-  animation: mfScreenEnter 0.35s cubic-bezier(0.2, 0.9, 0.3, 1);
-}
-
-.mf-banner-title {
-  margin: 0;
-  font-size: clamp(1.45rem, 4.8vw, 2.05rem);
-  font-weight: 950;
-  letter-spacing: 1.6px;
-  text-transform: uppercase;
-  text-align: center;
-  background: linear-gradient(180deg, #fffbeb 0%, #fde047 45%, #eab308 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  filter: drop-shadow(0 0 14px rgba(250, 204, 21, 0.45));
-  animation: mfTitleGlow 2s ease-in-out infinite;
-}
-
-.mf-mode-badge {
-  padding: 4px 14px;
-  border-radius: 999px;
-  font-size: 0.74rem;
-  font-weight: 800;
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
-  color: #fde047;
-  background: rgba(15, 29, 69, 0.9);
-  border: 1px solid rgba(250, 204, 21, 0.35);
-}
-
-.mf-arena-2p {
-  width: 100%;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  align-items: center;
-  gap: 10px;
-}
-
-.mf-arena-4p {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-}
-
-.mf-grid-4p {
-  width: 100%;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.mf-vs-badge {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 56px;
-  height: 56px;
-  padding: 0 12px;
-  border-radius: 16px;
-  font-size: 1.35rem;
-  font-weight: 950;
-  font-style: italic;
-  letter-spacing: 1px;
-  color: #091124;
-  background: linear-gradient(145deg, #fef08a 0%, #facc15 52%, #ca8a04 100%);
-  border: 2px solid #fffbeb;
-  box-shadow: 0 0 24px rgba(250, 204, 21, 0.55), 0 8px 18px rgba(0, 0, 0, 0.45);
-  animation: mfVsPulse 1.5s ease-in-out infinite;
-  user-select: none;
-}
-
-.mf-arena-4p .mf-vs-badge {
-  min-width: 64px;
-  height: 44px;
-  font-size: 1.15rem;
-  border-radius: 12px;
-}
-
-.mf-player-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 14px 10px 12px;
-  border-radius: 16px;
-  background: linear-gradient(180deg, rgba(16, 33, 77, 0.95) 0%, rgba(8, 17, 42, 0.98) 100%);
-  border: 1.5px solid rgba(250, 204, 21, 0.34);
-  box-shadow: 0 10px 24px rgba(2, 6, 23, 0.6), inset 0 1px 0 rgba(254, 240, 138, 0.18);
-  transform: perspective(700px) rotateX(2deg);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-  box-sizing: border-box;
-  min-width: 0;
-}
-
-.mf-player-card:hover {
-  transform: perspective(700px) rotateX(0deg) translateY(-2px);
-  border-color: rgba(253, 224, 71, 0.72);
-  box-shadow: 0 14px 28px rgba(2, 6, 23, 0.72), 0 0 18px rgba(250, 204, 21, 0.22);
-}
-
-.mf-avatar-ring {
-  width: 62px;
-  height: 62px;
-  border-radius: 50%;
-  padding: 2.5px;
-  background: linear-gradient(135deg, #fef08a, #facc15, #b45309);
-  box-shadow: 0 0 16px rgba(250, 204, 21, 0.42);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.mf-avatar-inner {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  overflow: hidden;
-  background: #0b1633;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.35rem;
-  font-weight: 900;
-  color: #fde047;
-}
-
-.mf-avatar-inner img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.mf-player-name {
-  width: 100%;
-  font-size: 0.9rem;
-  font-weight: 800;
-  color: #ffffff;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.mf-player-meta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  width: 100%;
-}
-
-.mf-meta-pill {
-  padding: 2px 8px;
-  border-radius: 8px;
-  font-size: 0.69rem;
-  font-weight: 700;
-  color: #fde68a;
-  background: rgba(250, 204, 21, 0.12);
-  border: 1px solid rgba(250, 204, 21, 0.25);
-}
-
-.mf-countdown-box {
-  width: 100%;
-  max-width: 340px;
-  margin-top: 2px;
-  padding: 12px 16px;
-  border-radius: 15px;
-  background: linear-gradient(180deg, rgba(15, 29, 69, 0.95), rgba(7, 15, 38, 0.98));
-  border: 1.5px solid rgba(250, 204, 21, 0.45);
-  box-shadow: 0 8px 22px rgba(2, 6, 23, 0.55), 0 0 16px rgba(250, 204, 21, 0.16);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  text-align: center;
-  box-sizing: border-box;
-}
-
-.mf-countdown-label {
-  font-size: 0.74rem;
-  font-weight: 700;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-  color: #cbd5e1;
-}
-
-.mf-countdown-value {
-  font-size: 1.65rem;
-  font-weight: 950;
-  line-height: 1.15;
-  color: #fde047;
-  text-shadow: 0 0 14px rgba(250, 204, 21, 0.55);
-}
-
-@keyframes proSpinRing {
-  to {
-    transform: rotate(360deg);
+  if (activeRoomRef) {
+    off(activeRoomRef);
+    activeRoomRef = null;
   }
+  activeRoomId = null;
 }
 
-@keyframes proOrbitSlow {
-  to {
-    transform: rotate(-360deg);
-  }
-}
-
-@keyframes proCorePulse {
-  0%, 100% {
-    transform: scale(0.82);
-    opacity: 0.65;
-  }
-  50% {
-    transform: scale(1.18);
-    opacity: 1;
-  }
-}
-
-@keyframes proDotBounce {
-  0%, 80%, 100% {
-    transform: translateY(0) scale(0.8);
-    opacity: 0.4;
-  }
-  40% {
-    transform: translateY(-5px) scale(1.15);
-    opacity: 1;
-  }
-}
-
-@keyframes mfScreenEnter {
-  from {
-    opacity: 0;
-    transform: scale(0.95) translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-@keyframes mfTitleGlow {
-  0%, 100% {
-    filter: drop-shadow(0 0 12px rgba(250, 204, 21, 0.4));
-  }
-  50% {
-    filter: drop-shadow(0 0 22px rgba(253, 224, 71, 0.75));
-  }
-}
-
-@keyframes mfVsPulse {
-  0%, 100% {
-    transform: scale(1);
-    box-shadow: 0 0 20px rgba(250, 204, 21, 0.48), 0 8px 18px rgba(0, 0, 0, 0.45);
-  }
-  50% {
-    transform: scale(1.07);
-    box-shadow: 0 0 30px rgba(253, 224, 71, 0.8), 0 10px 22px rgba(0, 0, 0, 0.5);
-  }
-}
-
-@media (max-width: 480px) {
-  .pro-search-box {
-    max-width: 100%;
-    padding: 18px 12px 12px;
-    gap: 14px;
-    border-radius: 16px;
-  }
-
-  .pro-search-loader-wrap {
-    width: 58px;
-    height: 58px;
-  }
-
-  .pro-search-spinner {
-    width: 46px;
-    height: 46px;
-  }
-
-  .pro-search-status {
-    font-size: 0.88rem;
-  }
-
-  .pro-cancel-btn {
-    width: 100%;
-    max-width: 220px;
-    padding: 11px 18px;
-    font-size: 0.84rem;
-  }
-
-  .match-found-screen {
-    padding: 14px 10px;
-    gap: 12px;
-    border-radius: 16px;
-  }
-
-  .mf-arena-2p {
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-    gap: 6px;
-  }
-
-  .mf-vs-badge {
-    min-width: 44px;
-    height: 44px;
-    padding: 0 8px;
-    font-size: 1.02rem;
-    border-radius: 12px;
-  }
-
-  .mf-player-card {
-    padding: 10px 6px;
-    gap: 6px;
-    border-radius: 13px;
-  }
-
-  .mf-avatar-ring {
-    width: 50px;
-    height: 50px;
-  }
-
-  .mf-player-name {
-    font-size: 0.8rem;
-  }
-
-  .mf-countdown-value {
-    font-size: 1.4rem;
-  }
-  }
+window.LudoOnlineRoom = {
+  ...(window.LudoOnlineRoom || {}),
+  findOnlineMatch,
+  cancelMatchmaking,
+  leaveOnlineRoom,
+  setPlayerReady,
+  subscribeToRoom,
+  startOnlineRoomMatch,
+  pushRoomMove
+};
