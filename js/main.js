@@ -583,8 +583,7 @@
   }
 
   document.getElementById("btn-close-modal").addEventListener("click", () => {
-  document.getElementById("btn-close-modal").addEventListener("click", () => {
-    if (window.LudoSound) window.LudoSound.click();
+        if (window.LudoSound) window.LudoSound.click();
     closeModal(false);
   });
   modalOverlay.addEventListener("click", (e) => {
@@ -1043,4 +1042,3 @@
     const profileBannerHtml = renderOnlineProfileBanner(playerProfile);
   }
 })();
-      
