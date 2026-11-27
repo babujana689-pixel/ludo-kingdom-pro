@@ -542,6 +542,14 @@
     const crownBadge = player?.isHost
       ? `<span class="mf-avatar-3d-crown" aria-hidden="true">👑</span>`
       : "";
+function escapeRoyalHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
 
     if (avatarUrl) {
       return `
