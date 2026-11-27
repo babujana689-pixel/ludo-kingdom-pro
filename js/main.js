@@ -578,7 +578,8 @@
     const colorKey = normalizeRoyalColor(player?.color, index, maxPlayers);
     const colorLabel = colorKey.toUpperCase();
     const safeName = escapeRoyalHtml(player?.name || "Player");
-    const isReady = Boolean(player?.ready);.level === "number" && player.level > 0
+    const isReady = Boolean(player?.ready);
+    const levelText = typeof player?.level === "number" && player.level > 0
       ? `LVL ${player.level}`
       : (player?.tier ? escapeRoyalHtml(player.tier) : "");
 
@@ -1027,7 +1028,7 @@
           <span id="label-sfx-vol" style="font-size:0.78rem;color:#facc15;font-weight:800;min-width:34px;text-align:right;">${Math.round(s.sfxVolume * 100)}%</span>
         </div>
       </div>
- 
+
       <button type="button" class="golden-start-btn" id="btn-test-royal-sound" style="margin-top:4px;">
         <span>🔔</span>
         <span>TEST ROYAL AUDIO</span>
@@ -1454,4 +1455,3 @@
     const profileBannerHtml = renderOnlineProfileBanner(playerProfile);
   }
 })();
-    const levelText = typeof player?
