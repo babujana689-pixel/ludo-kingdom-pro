@@ -1259,7 +1259,15 @@
       if (matchData?.roomId && window.LudoOnlineRoom && typeof window.LudoOnlineRoom.startOnlineRoomMatch === "function") {
         await window.LudoOnlineRoom.startOnlineRoomMatch(matchData.roomId).catch(() => {});
       }
+const activeUid =
+  typeof currentUid === "string" && currentUid
+    ? currentUid
+    : (window.auth?.currentUser?.uid || "");
 
+if (window.LudoTextChat && matchData?.roomId && activeUid) {
+  window.LudoTextChat.mountRoom(matchData.roomId, activeUid);
+}
+      
       if (typeof onComplete === "function") {
         onComplete({
           ...matchData,
