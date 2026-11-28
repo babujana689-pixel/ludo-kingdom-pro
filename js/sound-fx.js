@@ -1,4 +1,4 @@
-// js/sound-fx.js - 100% Offline Procedural Royal Music Loops & Realistic Sound Effects
+// js/sound-fx.js - LUDO ADDA 100% Offline Procedural Royal Music Loops & Realistic Sound Effects
 window.LudoSound = (function () {
   let ctx = null;
   let bgmTimer = null;
@@ -6,7 +6,7 @@ window.LudoSound = (function () {
   let stepIndex = 0;
 
   // Persistent Audio Settings
-  const STORAGE_KEY = "ludo_kingdom_audio_v1";
+  const STORAGE_KEY = "ludo_adda_audio_v1";
   let settings = {
     musicEnabled: true,
     sfxEnabled: true,
@@ -16,7 +16,18 @@ window.LudoSound = (function () {
 
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
-    if (saved) settings = { ...settings, ...saved };
+    if (saved && typeof saved === "object") {
+      settings = {
+        musicEnabled: typeof saved.musicEnabled === "boolean" ? saved.musicEnabled : settings.musicEnabled,
+        sfxEnabled: typeof saved.sfxEnabled === "boolean" ? saved.sfxEnabled : settings.sfxEnabled,
+        musicVolume: typeof saved.musicVolume === "number"
+          ? Math.max(0, Math.min(1, saved.musicVolume))
+          : settings.musicVolume,
+        sfxVolume: typeof saved.sfxVolume === "number"
+          ? Math.max(0, Math.min(1, saved.sfxVolume))
+          : settings.sfxVolume
+      };
+    }
   } catch (e) {}
 
   function saveSettings() {
@@ -28,7 +39,13 @@ window.LudoSound = (function () {
   function ensureCtx() {
     if (!ctx) {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (AudioCtx) ctx = new AudioCtx();
+      if (AudioCtx) {
+        try {
+          ctx = new AudioCtx();
+        } catch (e) {
+          ctx = null;
+        }
+      }
     }
     if (ctx && ctx.state === "suspended") {
       ctx.resume().catch(() => {});
@@ -75,7 +92,6 @@ window.LudoSound = (function () {
     osc.type = type;
     osc.frequency.setValueAtTime(freq, now);
 
-    // Gentle attack & release for pleasant ambient music
     gain.gain.setValueAtTime(0.0005, now);
     gain.gain.linearRampToValueAtTime(vol, now + 0.04);
     gain.gain.exponentialRampToValueAtTime(0.0005, now + duration);
@@ -120,14 +136,21 @@ window.LudoSound = (function () {
     }
   };
 
+  function stopMusicLoop() {
+    if (bgmTimer) {
+      clearInterval(bgmTimer);
+      bgmTimer = null;
+    }
+  }
+
   function startMusicLoop(sceneName) {
+    const cfg = BGM_SCENES[sceneName];
+    if (!cfg) return;
     if (currentScene === sceneName && bgmTimer) return;
+
     stopMusicLoop();
     currentScene = sceneName;
     stepIndex = 0;
-
-    const cfg = BGM_SCENES[sceneName];
-    if (!cfg) return;
 
     const tick = () => {
       if (settings.musicEnabled && settings.musicVolume > 0 && ctx && ctx.state === "running") {
@@ -143,14 +166,6 @@ window.LudoSound = (function () {
     bgmTimer = setInterval(tick, cfg.intervalMs);
   }
 
-  function stopMusicLoop() {
-    if (bgmTimer) {
-      clearInterval(bgmTimer);
-      bgmTimer = null;
-    }
-    currentScene = "none";
-  }
-
   // Unlock AudioContext on first user touch anywhere on Android
   function unlockOnGesture() {
     ensureCtx();
@@ -160,6 +175,7 @@ window.LudoSound = (function () {
       startMusicLoop(target);
     }
   }
+
   document.addEventListener("pointerdown", unlockOnGesture, { passive: true });
   document.addEventListener("touchstart", unlockOnGesture, { passive: true });
 
@@ -168,7 +184,10 @@ window.LudoSound = (function () {
     playLobbyMusic() { startMusicLoop("lobby"); },
     playSetupMusic() { startMusicLoop("setup"); },
     playBoardMusic() { startMusicLoop("board"); },
-    stopMusic() { stopMusicLoop(); },
+    stopMusic() {
+      stopMusicLoop();
+      currentScene = "none";
+    },
 
     // Premium UI Button Click Sound
     click() {
@@ -227,6 +246,14 @@ window.LudoSound = (function () {
     setMusicEnabled(val) {
       settings.musicEnabled = Boolean(val);
       saveSettings();
+      if (!settings.musicEnabled) {
+        stopMusicLoop();
+      } else if (currentScene !== "none") {
+        ensureCtx();
+        const sceneToResume = currentScene;
+        currentScene = "none";
+        startMusicLoop(sceneToResume);
+      }
     },
     setSfxEnabled(val) {
       settings.sfxEnabled = Boolean(val);
