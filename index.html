@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Ludo Kingdom Pro — Royal Ludo</title>
+  <title>LUDO ADDA — Social Gaming & Royal Ludo</title>
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/platform-ui.css" />
   <script src="js/three.min.js"></script>
@@ -24,7 +24,7 @@
     body {
       background: var(--navy-deep);
       color: var(--text-clean);
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Bengali", sans-serif;
     }
     .auth-gate-overlay {
       position: fixed;
@@ -48,6 +48,7 @@
       text-align: center;
       box-shadow: 0 22px 50px rgba(0, 0, 0, 0.85);
       pointer-events: auto;
+      touch-action: manipulation;
     }
     .auth-crown { font-size: 2.6rem; margin-bottom: 6px; }
     .auth-title { font-size: 1.45rem; font-weight: 900; color: var(--gold-primary); margin: 0 0 4px; }
@@ -86,6 +87,7 @@
     }
     .auth-status-msg { margin-top: 10px; font-size: 0.78rem; color: #facc15; min-height: 20px; }
     .avatar-ring img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+    .profile-pill.static-card { cursor: default; pointer-events: none; }
     .modal-overlay { background: rgba(4, 7, 18, 0.84); backdrop-filter: blur(10px); padding: 12px; z-index: 9000; }
     .modal-card {
       background: linear-gradient(165deg, #101b39 0%, #090f24 100%) !important;
@@ -192,14 +194,15 @@
     .pod-yellow { color: #facc15; }
     .pod-blue { color: #38bdf8; }
     .legacy-hidden { display: none !important; }
+    .bottom-nav { grid-template-columns: repeat(5, 1fr) !important; gap: 4px !important; }
   </style>
 </head>
 <body>
   <div id="auth-gate-overlay" class="auth-gate-overlay">
     <div class="auth-card">
       <div class="auth-crown">👑</div>
-      <h2 class="auth-title">LUDO KINGDOM PRO</h2>
-      <p class="auth-sub">Sign in to save coins, rank & play online</p>
+      <h2 class="auth-title">LUDO ADDA</h2>
+      <p class="auth-sub">Sign in to save coins, friends & game rooms</p>
       <button type="button" class="auth-btn btn-google" id="btn-login-google"><span>🔴</span> Continue with Google</button>
       <button type="button" class="auth-btn btn-facebook" id="btn-login-facebook"><span>🔵</span> Continue with Facebook</button>
       <button type="button" class="auth-btn btn-guest" id="btn-login-guest"><span>🎲</span> Play as Guest (Instant)</button>
@@ -212,71 +215,78 @@
 
   <div id="home-screen" class="screen active">
     <header class="top-bar">
-      <div class="profile-pill" id="btn-profile">
+      <div class="profile-pill static-card" id="top-profile-card" aria-label="Player Profile Info">
         <div class="avatar-ring" id="player-avatar-box">👑</div>
         <div class="profile-info">
           <span class="player-name" id="display-name">Royal Guest</span>
           <span class="player-level" id="player-level-badge">Lvl 1 • Novice</span>
         </div>
       </div>
-      <div class="currency-group">
+      <div class="currency-group" aria-label="Balances and Settings">
         <div class="currency-pill"><span class="coin-icon">🟡</span><span id="coin-balance">1,000</span></div>
         <div class="currency-pill"><span class="gem-icon">💎</span><span id="gem-balance">25</span></div>
-        <button class="icon-btn" id="btn-settings" aria-label="Settings">⚙️</button>
+        <button type="button" class="icon-btn" id="btn-settings" aria-label="Settings">⚙️</button>
       </div>
     </header>
 
-    <aside class="side-dock">
-      <button class="dock-item" id="btn-daily"><span class="dock-badge"></span><span class="dock-icon">🎁</span><span class="dock-label">Daily</span></button>
-      <button class="dock-item" id="btn-quests"><span class="dock-icon">⚔️</span><span class="dock-label">Quests</span></button>
-      <button class="dock-item" id="btn-friends"><span class="dock-icon">👥</span><span class="dock-label">Friends</span></button>
-      <button class="dock-item" id="btn-alerts"><span class="dock-icon">🔔</span><span class="dock-label">Alerts</span></button>
+    <aside class="side-dock" aria-label="Quick Menu">
+      <button type="button" class="dock-item" id="btn-daily"><span class="dock-badge"></span><span class="dock-icon">🎁</span><span class="dock-label">Daily</span></button>
+      <button type="button" class="dock-item" id="btn-quests"><span class="dock-icon">⚔️</span><span class="dock-label">Quests</span></button>
+      <button type="button" class="dock-item" id="btn-events"><span class="dock-icon">🏆</span><span class="dock-label">Events</span></button>
+      <button type="button" class="dock-item" id="btn-alerts"><span class="dock-icon">🔔</span><span class="dock-label">Alerts</span></button>
     </aside>
 
     <main class="hero-center">
-      <div class="royal-badge">★ ROYAL EDITION ★</div>
-      <h1 class="game-title"><span class="title-main">LUDO KINGDOM</span><span class="title-3d">PRO</span></h1>
-      <p class="game-subtitle">Roll the Crown • Rule the Board</p>
+      <div class="royal-badge">★ ROYAL GAMING ADDA ★</div>
+      <h1 class="game-title"><span class="title-main">LUDO ADDA</span><span class="title-3d">PRO</span></h1>
+      <p class="game-subtitle">Roll the Dice • Play & Chat in Rooms</p>
     </main>
 
     <section class="bottom-controls">
-      <button class="btn-primary-hero" id="btn-play-offline">
+      <button type="button" class="btn-primary-hero" id="btn-play-offline">
         <span class="btn-hero-icon">🎲</span>
         <div class="btn-hero-text">
-          <span class="btn-hero-title">PLAY OFFLINE & AI</span>
-          <span class="btn-hero-sub">Pass & Play • Smart AI</span>
+          <span class="btn-hero-title">OFFLINE LUDO & AI</span>
+          <span class="btn-hero-sub">Pass & Play • Smart AI Bots</span>
         </div>
       </button>
 
       <div class="mode-grid">
-        <button class="mode-card" id="btn-play-online">
+        <button type="button" class="mode-card" id="btn-play-online">
           <span class="mode-icon">🌐</span>
-          <span class="mode-title">Online Match</span>
+          <span class="mode-title">Online Ludo</span>
           <span class="mode-tag">2P / 4P Live</span>
         </button>
-        <button class="mode-card" id="btn-private-room">
+        <button type="button" class="mode-card" id="btn-private-room">
           <span class="mode-icon">🏰</span>
           <span class="mode-title">Private Room</span>
-          <span class="mode-tag">Voice + Code</span>
+          <span class="mode-tag">Code + Room Mic</span>
         </button>
       </div>
 
-      <nav class="bottom-nav">
-        <button class="nav-btn" id="btn-leaderboard">🏆<span>Ranks</span></button>
-        <button class="nav-btn" id="btn-skins">🎨<span>Skins</span></button>
-        <button class="nav-btn" id="btn-vip">👑<span>VIP Pass</span></button>
-        <button class="nav-btn" id="btn-history">📜<span>History</span></button>
+      <button type="button" class="mode-card" id="btn-voice-room" style="width:100%;flex-direction:row;gap:10px;padding:10px 14px;">
+        <span class="mode-icon">🎙️</span>
+        <span class="mode-title">Public Gaming Voice Room</span>
+        <span class="mode-tag">Gaming Adda</span>
+      </button>
+
+      <nav class="bottom-nav" aria-label="Bottom Navigation">
+        <button type="button" class="nav-btn active" id="nav-home">🏠<span>Home</span></button>
+        <button type="button" class="nav-btn" id="nav-friends">👥<span>Friends</span></button>
+        <button type="button" class="nav-btn" id="nav-game-rooms">🎮<span>Game Rooms</span></button>
+        <button type="button" class="nav-btn" id="nav-chats">💬<span>Chats</span><span class="chat-nav-badge hidden" id="chat-unread-badge">0</span></button>
+        <button type="button" class="nav-btn" id="nav-skin-shop">🎨<span>Skin Shop</span></button>
       </nav>
     </section>
   </div>
 
   <div id="game-hud" class="screen">
     <div class="hud-top">
-      <button class="hud-pill-btn" id="btn-exit-match">← Lobby</button>
-      <div class="match-info-badge" id="match-mode-label">Ludo Kingdom Pro</div>
+      <button type="button" class="hud-pill-btn" id="btn-exit-match">← Lobby</button>
+      <div class="match-info-badge" id="match-mode-label">LUDO ADDA</div>
       <div style="display:flex;gap:6px;">
-        <button class="hud-pill-btn" id="btn-ingame-audio">🔊</button>
-        <button class="hud-pill-btn" id="btn-reset-cam">🎥</button>
+        <button type="button" class="hud-pill-btn" id="btn-ingame-audio">🔊</button>
+        <button type="button" class="hud-pill-btn" id="btn-reset-cam">🎥</button>
       </div>
     </div>
 
@@ -309,9 +319,11 @@
     <div class="modal-card">
       <div class="modal-header">
         <h2 id="modal-title">Modal Title</h2>
-        <button class="modal-close" id="btn-close-modal">✕</button>
+        <button type="button" class="modal-close" id="btn-close-modal">✕</button>
       </div>
-      <div class="modal-body" id="modal-body"></div>
+      <div class="modal-body" id="modal-body">
+        <div id="earn-rewards-slot" aria-live="polite"></div>
+      </div>
     </div>
   </div>
 
@@ -337,15 +349,13 @@
       }
 
       if (skipBtn) {
-        ["click", "touchend"].forEach((ev) => {
-          skipBtn.addEventListener(ev, function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            if (overlay) {
-              overlay.classList.add("hidden");
-              overlay.style.display = "none";
-            }
-          }, { passive: false });
+        skipBtn.addEventListener("click", function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (overlay) {
+            overlay.classList.add("hidden");
+            overlay.style.display = "none";
+          }
         });
       }
 
@@ -402,12 +412,34 @@
       startOnlineRoomMatch,
       leaveOnlineRoom
     } from "./js/online-room.js";
+    import { openSkinShop } from "./js/skin-shop.js";
+    import "./js/text-chat.js";
 
     const authOverlay = document.getElementById("auth-gate-overlay");
     const statusMsg = document.getElementById("auth-status-msg");
     const modalOverlay = document.getElementById("modal-overlay");
     const modalTitle = document.getElementById("modal-title");
     const modalBody = document.getElementById("modal-body");
+
+    if (typeof window.showToast !== "function") {
+      window.showToast = (msg) => {
+        const t = document.getElementById("toast");
+        if (!t) return;
+        t.textContent = String(msg ?? "");
+        t.classList.remove("hidden");
+        clearTimeout(t._timer);
+        t._timer = setTimeout(() => t.classList.add("hidden"), 2300);
+      };
+    }
+
+    function escapeHtml(val) {
+      return String(val ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
 
     function hideAuthOverlay() {
       if (authOverlay) {
@@ -429,6 +461,46 @@
     window.__royalLoginGoogle = () => runAuth(loginWithGoogle, "Google");
     window.__royalLoginFacebook = () => runAuth(loginWithFacebook, "Facebook");
     window.__royalLoginGuest = () => runAuth(loginAsGuest, "Guest");
+    window.__royalLogout = () => logoutPlayer();
+    window.__royalOpenSkinShop = openSkinShop;
+    window.__royalRoomApi = {
+      auth,
+      createPrivateRoom,
+      joinPrivateRoom,
+      findOnlineMatch,
+      subscribeToRoom,
+      startOnlineRoomMatch,
+      leaveOnlineRoom
+    };
+
+    document.getElementById("nav-skin-shop")?.addEventListener("click", () => {
+      if (typeof window.__royalOpenSkinShop === "function") {
+        window.__royalOpenSkinShop();
+      } else {
+        window.showToast("Skin Shop module not loaded yet.");
+      }
+    });
+
+    document.getElementById("nav-game-rooms")?.addEventListener("click", () => {
+      if (modalTitle) modalTitle.textContent = "Game Rooms & Earn Rewards";
+      if (modalBody) {
+        modalBody.innerHTML = `
+          <div class="royal-section-title">Game Rooms</div>
+          <p style="font-size:0.82rem;color:#cbd5e1;margin:0 0 12px;">Online Ludo, Private Room অথবা নিচের Earn Rewards থেকে বিজ্ঞাপন দেখে রিওয়ার্ড সংগ্রহ করুন।</p>
+          <div id="earn-rewards-slot" aria-live="polite"></div>
+        `;
+        const slot = document.getElementById("earn-rewards-slot");
+        if (slot && typeof window.renderEarnRewardsCard === "function") {
+          const completedAds = Number(window.currentRoyalProfile?.completedAds || 0);
+          window.renderEarnRewardsCard(slot, { completedAds });
+        }
+      }
+      if (modalOverlay) modalOverlay.classList.remove("hidden");
+    });
+
+    document.getElementById("btn-close-modal")?.addEventListener("click", () => {
+      if (modalOverlay) modalOverlay.classList.add("hidden");
+    });
 
     watchAuthState((user, profile) => {
       window.currentRoyalUser = user;
@@ -437,64 +509,21 @@
         const nameEl = document.getElementById("display-name");
         const lvlEl = document.getElementById("player-level-badge");
         const coinEl = document.getElementById("coin-balance");
+        const gemEl = document.getElementById("gem-balance");
         const box = document.getElementById("player-avatar-box");
 
         if (nameEl) nameEl.textContent = profile.name || "Royal Player";
         if (lvlEl) lvlEl.textContent = `Lvl ${profile.level || 1} • ${profile.isGuest ? "Guest" : "Verified"}`;
-        if (coinEl) coinEl.textContent = Number(profile.coins || 1000).toLocaleString();
-        if (box) box.innerHTML = profile.avatar ? `<img src="${profile.avatar}" alt="Avatar" />` : "👑";
+        if (coinEl) coinEl.textContent = Number(profile.coins ?? 1000).toLocaleString();
+        if (gemEl) gemEl.textContent = Number(profile.gems ?? profile.diamonds ?? 25).toLocaleString();
+        if (box) {
+          box.innerHTML = profile.avatar
+            ? `<img src="${escapeHtml(profile.avatar)}" alt="Avatar" referrerpolicy="no-referrer" />`
+            : "👑";
+        }
         hideAuthOverlay();
       }
     });
-
-        function renderWaitingRoom(roomData) {
-      window.activeOnlineRoom = roomData;
-      const players = Object.values(roomData.players || {});
-      const isHost = auth.currentUser && roomData.hostUid === auth.currentUser.uid;
-      const badge = { red: "🔴", green: "🟢", yellow: "🟡", blue: "🔵" };
-
-      if (modalTitle) {
-        modalTitle.textContent = roomData.isPrivate ? "🏰 PRIVATE ROYAL ROOM" : "🌐 RANDOM ONLINE MATCH";
-      }
-      if (modalBody) {
-        modalBody.innerHTML = `
-          <div class="room-code-banner">
-            <div style="font-size:0.72rem;color:#cbd5e1;font-weight:700;">ROOM CODE</div>
-            <div style="font-size:1.55rem;font-weight:900;color:#facc15;letter-spacing:4px;margin:4px 0;">${roomData.roomId}</div>
-            <button type="button" id="btn-copy-code" class="toggle-pill-btn on">📋 Copy Code</button>
-          </div>
-          <div class="royal-section-title">Players (${players.length}/${roomData.maxPlayers})</div>
-          <div class="slot-list">
-            ${players.map((p) => `<div class="slot-row"><div class="slot-color-info"><span>${badge[p.color] || "🎲"}</span><span>${p.name}${p.isHost ? " 👑" : ""}</span></div><span style="font-size:0.74rem;color:#4ade80;font-weight:800;">READY</span></div>`).join("")}
-          </div>
-          ${isHost ? `<button type="button" id="btn-start-room" class="golden-start-btn" style="margin-bottom:8px;">🚀 Start Match (${players.length}P)</button>` : ""}
-          <button type="button" id="btn-leave-room" class="golden-start-btn" style="background:#1e293b;border-color:#64748b;color:#fff;">← Leave Room</button>
-        `;
-      }
-      modalOverlay?.classList.remove("hidden");
-
-      const copyBtn = document.getElementById("btn-copy-code");
-      if (copyBtn) {
-        copyBtn.onclick = function () {
-          navigator.clipboard?.writeText(roomData.roomId);
-          this.textContent = "✅ Copied!";
-        };
-      }
-
-      const startBtn = document.getElementById("btn-start-room");
-      if (startBtn && isHost) {
-        startBtn.onclick = () => startOnlineRoomMatch(roomData.roomId);
-      }
-
-      const leaveBtn = document.getElementById("btn-leave-room");
-      if (leaveBtn) {
-        leaveBtn.onclick = async () => {
-          await leaveOnlineRoom();
-          window.activeOnlineRoom = null;
-          modalOverlay?.classList.add("hidden");
-        };
-      }
-    }
   </script>
 </body>
 </html>
