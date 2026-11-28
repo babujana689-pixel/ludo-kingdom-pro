@@ -1,4 +1,4 @@
-// Online Matchmaking & Private Room Controller for Ludo Kingdom Pro
+// Online Matchmaking & Private Room Controller for LUDO ADDA
 import { auth, db } from "./firebase-config.js";
 import {
   ref,
@@ -16,6 +16,7 @@ const COLOR_ORDER_4P = ["red", "green", "yellow", "blue"];
 
 let activeRoomId = null;
 let activeRoomRef = null;
+let activeMatchListener = null;
 let activeQueueRef = null;
 let activeQueueKey = null;
 let activeQueuePath = null;
@@ -85,9 +86,10 @@ export async function createPrivateRoom(maxPlayers = 4) {
   const me = getCurrentPlayerInfo();
   if (!me) throw new Error("Please sign in first (Google, Facebook, or Guest).");
 
+  const targetCount = maxPlayers === 2 ? 2 : 4;
   const roomCode = generateRoomCode();
   const roomRef = ref(db, `rooms/${roomCode}`);
-  const payload = buildRoomPayload(roomCode, me, maxPlayers, true);
+  const payload = buildRoomPayload(roomCode, me, targetCount, true);
   await set(roomRef, payload);
 
   activeRoomId = roomCode;
@@ -100,7 +102,7 @@ export async function joinPrivateRoom(roomCodeInput) {
   const me = getCurrentPlayerInfo();
   if (!me) throw new Error("Please sign in first (Google, Facebook, or Guest).");
 
-  const roomCode = roomCodeInput.trim().toUpperCase();
+  const roomCode = String(roomCodeInput || "").trim().toUpperCase();
   if (roomCode.length < 4) throw new Error("Enter a valid room code.");
 
   const roomRef = ref(db, `rooms/${roomCode}`);
@@ -264,6 +266,7 @@ export async function findOnlineMatch(maxPlayers = 2, callbacks = {}) {
     }
   };
 
+  activeMatchListener = handleRoomUpdate;
   onValue(roomRef, handleRoomUpdate);
   return payload;
 }
@@ -330,7 +333,10 @@ export async function startOnlineRoomMatch(roomId) {
 
 // ছক্কা ও চালের তথ্য সার্ভারে পাঠানো
 export async function pushRoomMove(roomId, moveData) {
-  await update(ref(db, `rooms/${roomId}`), {
+  const targetRoomId = roomId || activeRoomId;
+  if (!targetRoomId || !moveData) return;
+
+  await update(ref(db, `rooms/${targetRoomId}`), {
     ...moveData,
     updatedAt: Date.now()
   });
@@ -352,10 +358,11 @@ export async function leaveOnlineRoom() {
   });
   roomListeners.clear();
 
-  if (activeRoomRef) {
-    off(activeRoomRef);
-    activeRoomRef = null;
+  if (activeRoomRef && activeMatchListener) {
+    off(activeRoomRef, "value", activeMatchListener);
   }
+  activeMatchListener = null;
+  activeRoomRef = null;
   activeRoomId = null;
 }
 
