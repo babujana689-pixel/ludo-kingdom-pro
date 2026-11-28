@@ -1,4 +1,4 @@
-// js/board3d.js - Ludo Kingdom Pro 3D Board with Luxury Golden Crown Centerpiece
+// js/board3d.js - LUDO ADDA 3D Board with Luxury Golden Crown Centerpiece
 window.LudoBoard3D = (function () {
   let boardGroup = null;
   let piecesGroup = null;
@@ -39,6 +39,22 @@ window.LudoBoard3D = (function () {
     yellow: [[1.5, 10.5], [1.5, 12.5], [3.5, 10.5], [3.5, 12.5]],
     blue:   [[10.5, 10.5],[10.5, 12.5],[12.5, 10.5],[12.5, 12.5]]
   };
+
+  function disposeGroup(group) {
+    if (!group) return;
+    group.traverse((obj) => {
+      if (obj.geometry) {
+        obj.geometry.dispose();
+      }
+      if (obj.material) {
+        const materials = Array.isArray(obj.material) ? obj.material : [obj.material];
+        materials.forEach((mat) => {
+          if (mat.map) mat.map.dispose();
+          mat.dispose();
+        });
+      }
+    });
+  }
 
   function gridToWorld(row, col) {
     return {
@@ -93,7 +109,7 @@ window.LudoBoard3D = (function () {
     return new THREE.Mesh(geo, mat);
   }
 
-  // High-resolution engraved "LUDO KINGDOM PRO" circular medallion texture
+  // High-resolution engraved "LUDO ADDA" circular medallion texture
   function createRoyalEmblemTexture() {
     const size = 512;
     const cvs = document.createElement("canvas");
@@ -139,28 +155,21 @@ window.LudoBoard3D = (function () {
       ctx.fill();
     }
 
-    // Engraved Title: LUDO KINGDOM
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.shadowColor = "rgba(56, 189, 248, 0.85)";
     ctx.shadowBlur = 14;
 
     ctx.fillStyle = "#ffe066";
-    ctx.font = "900 32px Georgia, serif";
-    ctx.fillText("LUDO KINGDOM", cx, cy + 108);
-
-    // Crisp Pro Subtitle: PRO
-    ctx.fillStyle = "#38bdf8";
     ctx.font = "900 36px Georgia, serif";
-    ctx.fillText("PRO", cx, cy + 148);
+    ctx.fillText("LUDO ADDA", cx, cy + 114);
 
-    // Small royal banner text at top arc
-    ctx.fillStyle = "#7dd3fc";
-    ctx.font = "700 22px sans-serif";
-    ctx.fillText("★ ROYAL EDITION ★", cx, cy - 135);
+    ctx.fillStyle = "#38bdf8";
+    ctx.font = "800 22px sans-serif";
+    ctx.fillText("★ ROYAL SOCIAL EDITION ★", cx, cy - 135);
 
     const tex = new THREE.CanvasTexture(cvs);
-    tex.anisotropy = 4;
+    tex.anisotropy = 2;
     return tex;
   }
 
@@ -169,7 +178,6 @@ window.LudoBoard3D = (function () {
     const center = new THREE.Group();
     const half = 1.48;
 
-    // 1. Subtle 4-color inlaid goal triangles at the outer corners of the 3x3 center
     const cornerTris = [
       { color: COLORS.green,  pts: [[-half, -half], [0, 0], [-half, half]] },
       { color: COLORS.yellow, pts: [[-half, -half], [half, -half], [0, 0]] },
@@ -194,9 +202,8 @@ window.LudoBoard3D = (function () {
       center.add(mesh);
     });
 
-    // 2. Subtle Blue Outer Aura Disc
     const blueGlowDisc = new THREE.Mesh(
-      new THREE.CylinderGeometry(1.26, 1.32, 0.04, 48),
+      new THREE.CylinderGeometry(1.26, 1.32, 0.04, 36),
       new THREE.MeshBasicMaterial({
         color: COLORS.glowBlue,
         transparent: true,
@@ -206,7 +213,6 @@ window.LudoBoard3D = (function () {
     blueGlowDisc.position.y = 0.065;
     center.add(blueGlowDisc);
 
-    // 3. Premium Golden Circular Platform Base (Tier 1)
     const goldMat = new THREE.MeshStandardMaterial({
       color: COLORS.gold,
       roughness: 0.22,
@@ -221,32 +227,30 @@ window.LudoBoard3D = (function () {
     });
 
     const platformBase = new THREE.Mesh(
-      new THREE.CylinderGeometry(1.14, 1.22, 0.1, 48),
+      new THREE.CylinderGeometry(1.14, 1.22, 0.1, 36),
       goldMat
     );
     platformBase.position.y = 0.09;
     center.add(platformBase);
 
-    // Glowing Blue & Golden Rim Rings around Platform
     glowRingMat = new THREE.MeshBasicMaterial({
       color: COLORS.glowBlue,
       transparent: true,
       opacity: 0.75
     });
-    const blueRim = new THREE.Mesh(new THREE.TorusGeometry(1.18, 0.028, 12, 48), glowRingMat);
+    const blueRim = new THREE.Mesh(new THREE.TorusGeometry(1.18, 0.028, 12, 36), glowRingMat);
     blueRim.rotation.x = Math.PI / 2;
     blueRim.position.y = 0.11;
     center.add(blueRim);
 
-    const goldRim = new THREE.Mesh(new THREE.TorusGeometry(1.11, 0.038, 14, 48), brightGoldMat);
+    const goldRim = new THREE.Mesh(new THREE.TorusGeometry(1.11, 0.038, 12, 36), brightGoldMat);
     goldRim.rotation.x = Math.PI / 2;
     goldRim.position.y = 0.145;
     center.add(goldRim);
 
-    // 4. Inscribed "LUDO KINGDOM PRO" Medallion Top Plate
     const emblemTex = createRoyalEmblemTexture();
     const topMedallion = new THREE.Mesh(
-      new THREE.CylinderGeometry(1.07, 1.07, 0.03, 48),
+      new THREE.CylinderGeometry(1.07, 1.07, 0.03, 36),
       new THREE.MeshStandardMaterial({
         map: emblemTex,
         roughness: 0.28,
@@ -256,12 +260,11 @@ window.LudoBoard3D = (function () {
     topMedallion.position.y = 0.145;
     center.add(topMedallion);
 
-    // 5. Sculpted 3D Golden Royal Crown in the Center
     crownGroup = new THREE.Group();
     crownGroup.position.set(0, 0.17, -0.06);
 
     const velvetCore = new THREE.Mesh(
-      new THREE.SphereGeometry(0.32, 24, 18),
+      new THREE.SphereGeometry(0.32, 20, 16),
       new THREE.MeshStandardMaterial({
         color: 0x1d4ed8,
         roughness: 0.45,
@@ -275,14 +278,14 @@ window.LudoBoard3D = (function () {
     crownGroup.add(velvetCore);
 
     const crownBand = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.37, 0.31, 0.14, 32),
+      new THREE.CylinderGeometry(0.37, 0.31, 0.14, 24),
       brightGoldMat
     );
     crownBand.position.y = 0.07;
     crownGroup.add(crownBand);
 
     const bandRing = new THREE.Mesh(
-      new THREE.TorusGeometry(0.35, 0.025, 10, 32),
+      new THREE.TorusGeometry(0.35, 0.025, 10, 24),
       goldMat
     );
     bandRing.rotation.x = Math.PI / 2;
@@ -305,7 +308,7 @@ window.LudoBoard3D = (function () {
       const radius = 0.34;
 
       const spire = new THREE.Mesh(
-        new THREE.ConeGeometry(isMainSpire ? 0.085 : 0.065, spireH, 12),
+        new THREE.ConeGeometry(isMainSpire ? 0.085 : 0.065, spireH, 10),
         brightGoldMat
       );
       spire.position.set(
@@ -318,7 +321,7 @@ window.LudoBoard3D = (function () {
       crownGroup.add(spire);
 
       const pearl = new THREE.Mesh(
-        new THREE.SphereGeometry(isMainSpire ? 0.045 : 0.032, 12, 12),
+        new THREE.SphereGeometry(isMainSpire ? 0.045 : 0.032, 10, 10),
         pearlMat
       );
       pearl.position.set(
@@ -329,7 +332,7 @@ window.LudoBoard3D = (function () {
       crownGroup.add(pearl);
     }
 
-    const topFinial = new THREE.Mesh(new THREE.SphereGeometry(0.075, 16, 16), brightGoldMat);
+    const topFinial = new THREE.Mesh(new THREE.SphereGeometry(0.075, 12, 12), brightGoldMat);
     topFinial.position.y = 0.44;
     crownGroup.add(topFinial);
 
@@ -354,20 +357,20 @@ window.LudoBoard3D = (function () {
       metalness: 0.85
     });
 
-    const base = new THREE.Mesh(new THREE.CylinderGeometry(0.30, 0.35, 0.12, 24), goldMat);
+    const base = new THREE.Mesh(new THREE.CylinderGeometry(0.30, 0.35, 0.12, 20), goldMat);
     base.position.y = 0.06;
     pawn.add(base);
 
-    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.28, 0.52, 24), mat);
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.28, 0.52, 20), mat);
     body.position.y = 0.38;
     pawn.add(body);
 
-    const collar = new THREE.Mesh(new THREE.TorusGeometry(0.15, 0.035, 12, 24), goldMat);
+    const collar = new THREE.Mesh(new THREE.TorusGeometry(0.15, 0.035, 10, 20), goldMat);
     collar.rotation.x = Math.PI / 2;
     collar.position.y = 0.65;
     pawn.add(collar);
 
-    const head = new THREE.Mesh(new THREE.SphereGeometry(0.19, 24, 24), mat);
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.19, 20, 20), mat);
     head.position.y = 0.82;
     pawn.add(head);
 
@@ -375,7 +378,15 @@ window.LudoBoard3D = (function () {
   }
 
   function build(scene) {
-    if (boardGroup) scene.remove(boardGroup);
+    if (boardGroup) {
+      scene.remove(boardGroup);
+      disposeGroup(boardGroup);
+      boardGroup = null;
+      piecesGroup = null;
+      crownGroup = null;
+      glowRingMat = null;
+    }
+
     boardGroup = new THREE.Group();
 
     const frame = new THREE.Mesh(
@@ -446,7 +457,7 @@ window.LudoBoard3D = (function () {
       HOME_SLOTS[y.key].forEach((slot) => {
         const sp = gridToWorld(slot[0], slot[1]);
         const slotRim = new THREE.Mesh(
-          new THREE.TorusGeometry(0.42, 0.035, 10, 28),
+          new THREE.TorusGeometry(0.42, 0.035, 10, 24),
           new THREE.MeshStandardMaterial({ color: y.color, roughness: 0.4 })
         );
         slotRim.rotation.x = Math.PI / 2;
