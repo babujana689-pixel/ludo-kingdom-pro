@@ -1,6 +1,8 @@
-// js/main.js - Master Controller, Premium Dark Navy & Royal Gold UI, 4-Corner 3D Dice & Audio Manager
+// js/main.js - LUDO ADDA Master Controller, 4-Corner 3D Dice, Private Chat UI & Audio Manager
 (function () {
   const canvas = document.getElementById("game-canvas");
+  if (!canvas || !window.THREE) return;
+
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x070b19);
   scene.fog = new THREE.FogExp2(0x070b19, 0.01);
@@ -11,7 +13,7 @@
 
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 
   // Lighting
   const ambientLight = new THREE.AmbientLight(0xffffff, 0.92);
@@ -25,23 +27,59 @@
   rimLight.position.set(-8, 12, -8);
   scene.add(rimLight);
 
-  // Lobby 3D Showcase Group
+  // Lobby 3D Hero Showcase (Animated 3D Dice + Royal Crown Ring)
   const lobbyGroup = new THREE.Group();
-  const diceGeo = new THREE.BoxGeometry(2.0, 2.0, 2.0);
+  lobbyGroup.position.set(0, 0.35, 0);
+
+  const heroDiceGroup = new THREE.Group();
+  heroDiceGroup.position.y = 0.85;
+
+  const diceGeo = new THREE.BoxGeometry(1.55, 1.55, 1.55);
   const diceMat = new THREE.MeshStandardMaterial({
-    color: 0xd4af37,
-    roughness: 0.25,
-    metalness: 0.65
+    color: 0xfacc15,
+    roughness: 0.18,
+    metalness: 0.72,
+    emissive: 0x3b2804,
+    emissiveIntensity: 0.25
   });
   const lobbyDice = new THREE.Mesh(diceGeo, diceMat);
-  lobbyDice.position.y = 1.2;
-  lobbyGroup.add(lobbyDice);
+  heroDiceGroup.add(lobbyDice);
 
-  const ringGeo = new THREE.TorusGeometry(3.8, 0.08, 12, 48);
-  const ringMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, metalness: 0.8, roughness: 0.2 });
+  const innerFrame = new THREE.Mesh(
+    new THREE.BoxGeometry(1.62, 1.62, 1.62),
+    new THREE.MeshBasicMaterial({
+      color: 0xfef08a,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.22
+    })
+  );
+  heroDiceGroup.add(innerFrame);
+  lobbyGroup.add(heroDiceGroup);
+
+  const ringGeo = new THREE.TorusGeometry(2.85, 0.065, 14, 56);
+  const ringMat = new THREE.MeshStandardMaterial({
+    color: 0xfacc15,
+    metalness: 0.85,
+    roughness: 0.2
+  });
   const lobbyRing = new THREE.Mesh(ringGeo, ringMat);
-  lobbyRing.rotation.x = Math.PI / 2;
+  lobbyRing.rotation.x = Math.PI / 2.25;
+  lobbyRing.position.y = 0.25;
   lobbyGroup.add(lobbyRing);
+
+  const outerAuraGeo = new THREE.RingGeometry(3.05, 3.22, 48);
+  const outerAuraMat = new THREE.MeshBasicMaterial({
+    color: 0x38bdf8,
+    side: THREE.DoubleSide,
+    transparent: true,
+    opacity: 0.22
+  });
+  const lobbyAura = new THREE.Mesh(outerAuraGeo, outerAuraMat);
+  lobbyAura.rotation.x = -Math.PI / 2.25;
+  lobbyAura.position.y = 0.2;
+  lobbyGroup.add(lobbyAura);
+
   scene.add(lobbyGroup);
 
   // Start Lobby Royal Fantasy Music
@@ -103,7 +141,7 @@
     });
 
     const tex = new THREE.CanvasTexture(cvs);
-    tex.anisotropy = 4;
+    tex.anisotropy = 2;
     return tex;
   }
 
@@ -146,7 +184,7 @@
 
       const dRenderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
       dRenderer.setSize(42, 42);
-      dRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      dRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
       slotEl.innerHTML = "";
       slotEl.appendChild(dRenderer.domElement);
 
@@ -211,7 +249,29 @@
     });
   }
 
-  // Position the 4 Corner Pods precisely above Green/Yellow Homes and below Red/Blue Homes
+  // Board & Camera State
+  let isBoardActive = false;
+  const LOCKED_CAM_ANGLE = 0;
+  const LOCKED_CAM_PITCH = 0.14;
+  let touchStartPos = { x: 0, y: 0 };
+
+  function setLockedBoardCamera() {
+    const aspect = window.innerWidth / window.innerHeight;
+    const vFovRad = (camera.fov * Math.PI) / 180;
+    const hFovRad = 2 * Math.atan(Math.tan(vFovRad / 2) * aspect);
+
+    const boardSpan = 16.4;
+    const distWidth = (boardSpan / 2) / Math.tan(hFovRad / 2);
+    const distHeight = (boardSpan / 2) / Math.tan(vFovRad / 2) * 1.44;
+    const camDist = Math.max(distWidth, distHeight, 25.5);
+
+    camera.position.x = camDist * Math.sin(LOCKED_CAM_PITCH) * Math.sin(LOCKED_CAM_ANGLE);
+    camera.position.y = camDist * Math.cos(LOCKED_CAM_PITCH);
+    camera.position.z = camDist * Math.sin(LOCKED_CAM_PITCH) * Math.cos(LOCKED_CAM_ANGLE);
+    camera.lookAt(0, 0, 0.1);
+    camera.updateMatrixWorld();
+  }
+
   function positionCornerPods() {
     if (!isBoardActive) return;
     const rect = canvas.getBoundingClientRect();
@@ -282,6 +342,7 @@
   // Toast Helper
   function showToast(msg) {
     const t = document.getElementById("toast");
+    if (!t) return;
     t.textContent = msg;
     t.classList.remove("hidden");
     clearTimeout(t._timer);
@@ -296,28 +357,6 @@
         trigger3DDiceRoll(color, rolledValue);
       }
     });
-  }
-
-  // Locked Top-Down 3D Angle & Auto-Fit Full Board Size
-  let isBoardActive = false;
-  const LOCKED_CAM_ANGLE = 0;
-  const LOCKED_CAM_PITCH = 0.14;
-  let touchStartPos = { x: 0, y: 0 };
-
-  function setLockedBoardCamera() {
-    const aspect = window.innerWidth / window.innerHeight;
-    const vFovRad = (camera.fov * Math.PI) / 180;
-    const hFovRad = 2 * Math.atan(Math.tan(vFovRad / 2) * aspect);
-
-    const boardSpan = 16.4;
-    const distWidth = (boardSpan / 2) / Math.tan(hFovRad / 2);
-    const distHeight = (boardSpan / 2) / Math.tan(vFovRad / 2) * 1.44;
-    const camDist = Math.max(distWidth, distHeight, 25.5);
-
-    camera.position.x = camDist * Math.sin(LOCKED_CAM_PITCH) * Math.sin(LOCKED_CAM_ANGLE);
-    camera.position.y = camDist * Math.cos(LOCKED_CAM_PITCH);
-    camera.position.z = camDist * Math.sin(LOCKED_CAM_PITCH) * Math.cos(LOCKED_CAM_ANGLE);
-    camera.lookAt(0, 0, 0.1);
   }
 
   // Smart Touch Detection
@@ -422,23 +461,23 @@
   function enter3DBoard(modeTitle, modeOrConfig) {
     ensureBoardBuilt();
     isBoardActive = true;
-    homeScreen.classList.remove("active");
-    gameHud.classList.add("active");
+    homeScreen?.classList.remove("active");
+    gameHud?.classList.add("active");
     lobbyGroup.visible = false;
     if (window.LudoBoard3D) window.LudoBoard3D.showBoard(true);
     if (window.LudoEngine) window.LudoEngine.startMatch(modeOrConfig);
     if (window.LudoSound) window.LudoSound.playBoardMusic();
-    document.getElementById("match-mode-label").textContent = modeTitle;
+    const modeLabelEl = document.getElementById("match-mode-label");
+    if (modeLabelEl) modeLabelEl.textContent = modeTitle;
     closeModal(true);
     setLockedBoardCamera();
-    camera.updateMatrixWorld();
     positionCornerPods();
   }
 
   function exitToLobby() {
     isBoardActive = false;
-    gameHud.classList.remove("active");
-    homeScreen.classList.add("active");
+    gameHud?.classList.remove("active");
+    homeScreen?.classList.add("active");
     if (window.LudoBoard3D) window.LudoBoard3D.showBoard(false);
     if (window.LudoSound) window.LudoSound.playLobbyMusic();
     lobbyGroup.visible = true;
@@ -446,62 +485,10 @@
     camera.lookAt(0, 0, 0);
   }
 
-  // Modal Helpers
+  // Modal & Match Found Helpers
   const modalOverlay = document.getElementById("modal-overlay");
   const modalTitle = document.getElementById("modal-title");
   const modalBody = document.getElementById("modal-body");
-  let activeMatchFoundTimer = null;
-
-  function clearMatchFoundCountdown() {
-    if (activeMatchFoundTimer) {
-      clearInterval(activeMatchFoundTimer);
-      activeMatchFoundTimer = null;
-    }
-  }
-
-  function openModal(title, html) {
-    clearMatchFoundCountdown();
-    if (window.LudoSound) window.LudoSound.click();
-    modalTitle.textContent = title;
-    modalBody.innerHTML = html;
-    modalOverlay.classList.remove("hidden");
-  }
-
-  function closeModal(skipMusicRestore = false) {
-    clearMatchFoundCountdown();
-    modalOverlay.classList.add("hidden");
-    if (!skipMusicRestore && window.LudoSound) {
-      if (isBoardActive) window.LudoSound.playBoardMusic();
-      else window.LudoSound.playLobbyMusic();
-    }
-  }
-
-  function escapeHtml(text) {
-    return String(text || "")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;");
-  }
-
-  function renderMatchFoundPlayerCard(player, index) {
-    const safeName = escapeHtml(player.name || `Player ${index + 1}`);
-    const initial = safeName.charAt(0).toUpperCase() || "P";
-    const hasAvatar = typeof player.avatar === "string" && player.avatar.trim().length > 0;
-    const avatarHtml = hasAvatar
-      ? `<img src="${escapeHtml(player.avatar)}" alt="${safeName}" referrerpolicy="no-referrer" />`
-      : `<span>${escapeHtml(initial)}</span>`;
-
-    const metaPills = [];
-    if (player.color) {
-      metaPills.push(`<span class="mf-meta-pill">${escapeHtml(String(player.color).toUpperCase())}</span>`);
-    }
-    if (typeof player.level === "number") {
-      metaPills.push(`<span class="mf-meta-pill">LVL ${player.level}</span>`);
-    }
-    if (player.tier) {
-      metaPills.push(`<span class="mf-meta-pill">${escapeHtml(player.tier)}</span>`);
-    }
 
   let matchFoundCountdownTimer = null;
   let matchFoundUnsubscribe = null;
@@ -519,8 +506,33 @@
     matchFoundHasStarted = false;
   }
 
-  function escapeRoyalHtml(str) {
-    return String(str ?? "")
+  function openModal(title, html) {
+    if (window.LudoSound) window.LudoSound.click();
+    if (modalTitle) modalTitle.textContent = title;
+    if (modalBody) modalBody.innerHTML = html;
+    modalOverlay?.classList.remove("hidden");
+  }
+
+  function closeModal(skipMusicRestore = false) {
+    clearMatchFoundCountdown();
+    if (window.LudoTextChat && typeof window.LudoTextChat.unmountDirectChat === "function") {
+      window.LudoTextChat.unmountDirectChat();
+    }
+    const card = modalOverlay?.querySelector(".modal-card");
+    card?.classList.remove("chat-fullscreen-card");
+    const modalHeader = document.querySelector(".modal-header, .royal-modal-header, #modal-header");
+    const closeBtn = document.getElementById("btn-close-modal");
+    if (modalHeader) modalHeader.style.display = "";
+    if (closeBtn) closeBtn.style.display = "";
+    modalOverlay?.classList.add("hidden");
+    if (!skipMusicRestore && window.LudoSound) {
+      if (isBoardActive) window.LudoSound.playBoardMusic();
+      else window.LudoSound.playLobbyMusic();
+    }
+  }
+
+  function escapeRoyalHtml(value) {
+    return String(value ?? "")
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
@@ -542,14 +554,6 @@
     const crownBadge = player?.isHost
       ? `<span class="mf-avatar-3d-crown" aria-hidden="true">👑</span>`
       : "";
-function escapeRoyalHtml(value) {
-  return String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
 
     if (avatarUrl) {
       return `
@@ -802,76 +806,12 @@ function escapeRoyalHtml(value) {
     }
   }
 
-    const maxPlayers = matchData?.maxPlayers === 4 ? 4 : 2;
-    const playersObj = matchData?.players || {};
-    const matchedPlayers = Array.isArray(matchData?.matchedPlayers) && matchData.matchedPlayers.length
-      ? matchData.matchedPlayers.slice(0, maxPlayers)
-      : Object.values(playersObj)
-          .filter((p) => p && p.uid)
-          .sort((a, b) => (a.joinedAt || 0) - (b.joinedAt || 0))
-          .slice(0, maxPlayers);
-
-    if (matchedPlayers.length < maxPlayers) return;
-
-    const cardsHtml = matchedPlayers.map((p, idx) => renderMatchFoundPlayerCard(p, idx)).join("");
-    const arenaHtml = maxPlayers === 4
-      ? `
-        <div class="mf-arena-4p">
-          <div class="mf-grid-4p">${cardsHtml}</div>
-          <div class="mf-vs-badge" aria-hidden="true">VS</div>
-        </div>
-      `
-      : `
-        <div class="mf-arena-2p">
-          ${renderMatchFoundPlayerCard(matchedPlayers[0], 0)}
-          <div class="mf-vs-badge" aria-hidden="true">VS</div>
-          ${renderMatchFoundPlayerCard(matchedPlayers[1], 1)}
-        </div>
-      `;
-
-    let secondsLeft = 5;
-
-    openModal(
-      "🏆 MATCH FOUND!",
-      `
-      <div class="match-found-screen">
-        <h2 class="mf-banner-title">MATCH FOUND!</h2>
-        <div class="mf-mode-badge">${escapeHtml(modeLabel)}</div>
-        ${arenaHtml}
-        <div class="mf-countdown-box">
-          <div class="mf-countdown-label">Match Starting Automatically</div>
-          <div class="mf-countdown-value" id="mf-countdown-timer">${secondsLeft}s</div>
-        </div>
-      </div>
-      `
-    );
-
-    const timerEl = document.getElementById("mf-countdown-timer");
-    clearMatchFoundCountdown();
-
-    activeMatchFoundTimer = setInterval(async () => {
-      secondsLeft -= 1;
-      if (timerEl) {
-        timerEl.textContent = `${Math.max(0, secondsLeft)}s`;
-      }
-
-      if (secondsLeft <= 0) {
-        clearMatchFoundCountdown();
-        if (window.LudoOnlineRoom && typeof window.LudoOnlineRoom.startOnlineRoomMatch === "function" && matchData?.roomId) {
-          await window.LudoOnlineRoom.startOnlineRoomMatch(matchData.roomId).catch(() => {});
-        }
-        if (typeof onComplete === "function") {
-          onComplete(matchData);
-        }
-      }
-    }, 1000);
-  }
-
-  document.getElementById("btn-close-modal").addEventListener("click", () => {
-        if (window.LudoSound) window.LudoSound.click();
+  document.getElementById("btn-close-modal")?.addEventListener("click", () => {
+    if (window.LudoSound) window.LudoSound.click();
     closeModal(false);
   });
-  modalOverlay.addEventListener("click", (e) => {
+
+  modalOverlay?.addEventListener("click", (e) => {
     if (e.target === modalOverlay) closeModal(false);
   });
 
@@ -900,7 +840,7 @@ function escapeRoyalHtml(value) {
       { key: "blue",   dot: "#38bdf8", text: "#38bdf8", name: "BLUE" }
     ];
 
-    openModal("👑 OFFLINE KINGDOM SETUP", `
+    openModal("👑 LUDO ADDA OFFLINE SETUP", `
       <div class="royal-section-title">⚡ QUICK MODES</div>
       <div class="quick-modes-grid">
         ${presets.map((p) => `
@@ -941,7 +881,7 @@ function escapeRoyalHtml(value) {
       });
 
       slotColors.forEach((sc) => {
-        const container = modalBody.querySelector(`[data-slot="${sc.key}"]`);
+        const container = modalBody?.querySelector(`[data-slot="${sc.key}"]`);
         if (!container) return;
         container.querySelectorAll(".role-pill").forEach((btn) => {
           btn.classList.toggle("active", btn.dataset.role === slotState[sc.key]);
@@ -949,7 +889,7 @@ function escapeRoyalHtml(value) {
       });
     }
 
-    modalBody.querySelectorAll(".role-pill").forEach((btn) => {
+    modalBody?.querySelectorAll(".role-pill").forEach((btn) => {
       btn.addEventListener("click", () => {
         if (window.LudoSound) window.LudoSound.click();
         selectedPresetId = "";
@@ -971,7 +911,7 @@ function escapeRoyalHtml(value) {
       }
     });
 
-    document.getElementById("btn-start-custom-offline").addEventListener("click", () => {
+    document.getElementById("btn-start-custom-offline")?.addEventListener("click", () => {
       const entries = Object.values(slotState);
       const humans = entries.filter((r) => r === "human").length;
       const ais = entries.filter((r) => r === "ai").length;
@@ -996,6 +936,325 @@ function escapeRoyalHtml(value) {
 
     refreshSetupUI();
   }
+
+  // =========================================================
+  // PART 2: PRIVATE-ONLY CHAT UI (1-TO-1 FRIENDS CHAT)
+  // =========================================================
+  const privateChatState = {
+    selectedPeerUid: "",
+    selectedPeerName: "",
+    peerOnline: false,
+    emojiBarOpen: false,
+    menuOpen: false,
+    renderedIdsByPeer: {}
+  };
+
+  function getKnownFriendsList() {
+    const me = window.LudoTextChat?.resolveUid?.() || window.currentRoyalUser?.uid || "";
+    const rawFriends = window.currentRoyalProfile?.friends;
+    const list = [];
+
+    if (Array.isArray(rawFriends)) {
+      rawFriends.forEach((f, idx) => {
+        if (typeof f === "string" && f.trim() && f.trim() !== me) {
+          list.push({ uid: f.trim(), name: `Friend ${idx + 1}` });
+        } else if (f && typeof f === "object" && f.uid && f.uid !== me) {
+          list.push({ uid: String(f.uid), name: f.name || f.displayName || `Friend ${idx + 1}` });
+        }
+      });
+    } else if (rawFriends && typeof rawFriends === "object") {
+      Object.entries(rawFriends).forEach(([uid, info], idx) => {
+        if (uid && uid !== me) {
+          const nm = typeof info === "object" ? (info?.name || info?.displayName) : "";
+          list.push({ uid, name: nm || `Friend ${idx + 1}` });
+        }
+      });
+    }
+
+    const roomPlayers = window.activeOnlineRoom?.players;
+    if (roomPlayers && typeof roomPlayers === "object") {
+      Object.values(roomPlayers).forEach((p) => {
+        if (p?.uid && p.uid !== me && !list.some((item) => item.uid === p.uid)) {
+          list.push({ uid: String(p.uid), name: p.name || "Player" });
+        }
+      });
+    }
+
+    return list;
+  }
+
+  function formatMessageTime(ts) {
+    if (!ts) return "";
+    const d = new Date(Number(ts));
+    if (Number.isNaN(d.getTime())) return "";
+    return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  }
+
+  function appendPrivateMessageBubble(msg) {
+    const box = document.getElementById("chat-messages-box");
+    const peerUid = privateChatState.selectedPeerUid;
+    if (!box || !msg || !peerUid) return;
+
+    const me = window.LudoTextChat?.resolveUid?.() || "";
+    const isMine = Boolean(me && msg.senderUid === me);
+    const isForCurrentPeer =
+      msg.peerUid === peerUid ||
+      msg.senderUid === peerUid ||
+      (isMine && (!msg.recipientUid || msg.recipientUid === peerUid));
+
+    if (!isForCurrentPeer) return;
+
+    if (!privateChatState.renderedIdsByPeer[peerUid]) {
+      privateChatState.renderedIdsByPeer[peerUid] = new Set();
+    }
+    const dedupeKey = msg.id || `${msg.senderUid}_${msg.createdAt}_${msg.text}`;
+    if (privateChatState.renderedIdsByPeer[peerUid].has(dedupeKey)) return;
+    privateChatState.renderedIdsByPeer[peerUid].add(dedupeKey);
+
+    const emptyNote = box.querySelector(".chat-empty-note");
+    if (emptyNote) emptyNote.remove();
+
+    const bubbleRow = document.createElement("div");
+    bubbleRow.className = `chat-bubble-row ${isMine ? "right" : "left"}`;
+    bubbleRow.innerHTML = `
+      <div class="chat-bubble ${isMine ? "mine" : "peer"}">
+        <div class="chat-bubble-text">${escapeRoyalHtml(msg.text || "")}</div>
+        <div class="chat-bubble-time">${escapeRoyalHtml(formatMessageTime(msg.createdAt))}</div>
+      </div>
+    `;
+    box.appendChild(bubbleRow);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  function updatePrivatePresenceUi(online) {
+    privateChatState.peerOnline = Boolean(online);
+    const dot = document.getElementById("chat-peer-dot");
+    const label = document.getElementById("chat-peer-status-text");
+    if (dot) dot.classList.toggle("online", privateChatState.peerOnline);
+    if (label) label.textContent = privateChatState.peerOnline ? "Online" : "Offline";
+  }
+
+  async function mountSelectedFriendChat() {
+    const chatApi = window.LudoTextChat;
+    const box = document.getElementById("chat-messages-box");
+    const peerUid = privateChatState.selectedPeerUid;
+
+    if (box) {
+      box.innerHTML = `<div class="chat-empty-note" style="color:#94a3b8;font-size:0.74rem;text-align:center;padding:14px;">${
+        peerUid ? "Loading conversation..." : "Select a friend from the list to open private chat."
+      }</div>`;
+    }
+
+    if (!peerUid || !chatApi) {
+      updatePrivatePresenceUi(false);
+      return;
+    }
+
+    privateChatState.renderedIdsByPeer[peerUid] = new Set();
+    const status = await chatApi.getPeerOnlineStatus?.(peerUid);
+    updatePrivatePresenceUi(Boolean(status?.online));
+    await chatApi.mountDirectChat(peerUid);
+  }
+
+  async function openPrivateChatModal() {
+    const friends = getKnownFriendsList();
+    if (privateChatState.selectedPeerUid && !friends.some((f) => f.uid === privateChatState.selectedPeerUid)) {
+      privateChatState.selectedPeerUid = "";
+      privateChatState.selectedPeerName = "";
+    }
+
+    const hasSelectedFriend = Boolean(privateChatState.selectedPeerUid);
+    if (!hasSelectedFriend) {
+      privateChatState.emojiBarOpen = false;
+      privateChatState.menuOpen = false;
+    }
+
+    const activeFriend = friends.find((f) => f.uid === privateChatState.selectedPeerUid);
+    const peerName = activeFriend?.name || privateChatState.selectedPeerName || "Select Friend";
+    const emojis = window.LudoTextChat?.getQuickEmojis?.() || ["😀", "😂", "😍", "🔥", "👑"];
+    const isBlocked = hasSelectedFriend
+      ? Boolean(window.LudoTextChat?.isUserBlocked?.(privateChatState.selectedPeerUid))
+      : false;
+
+    openModal("💬 PRIVATE CHAT", `
+      <div class="chat-ui-wrap" id="ludo-private-chat-ui">
+        <div class="royal-section-title" style="margin-bottom:2px;">Friends</div>
+        <div class="chat-friends-strip" id="chat-friends-list">
+          ${friends.length > 0
+            ? friends.map((f) => `
+              <button type="button" class="chat-friend-chip ${f.uid === privateChatState.selectedPeerUid ? "active" : ""}" data-peer-uid="${escapeRoyalHtml(f.uid)}" data-peer-name="${escapeRoyalHtml(f.name)}">
+                <span class="chat-status-dot ${f.uid === privateChatState.selectedPeerUid && privateChatState.peerOnline ? "online" : ""}"></span>
+                <span>${escapeRoyalHtml(f.name)}</span>
+              </button>
+            `).join("")
+            : `<span style="font-size:0.72rem;color:#94a3b8;">No friends found yet.</span>`
+          }
+        </div>
+
+        <div class="chat-thread-bar">
+          <div class="chat-thread-peer">
+            <span class="chat-status-dot ${hasSelectedFriend && privateChatState.peerOnline ? "online" : ""}" id="chat-peer-dot"></span>
+            <div>
+              <div id="chat-peer-name">${escapeRoyalHtml(peerName)}</div>
+              <div style="font-size:0.65rem;color:#94a3b8;" id="chat-peer-status-text">${hasSelectedFriend ? (privateChatState.peerOnline ? "Online" : "Offline") : "Offline"}</div>
+            </div>
+          </div>
+
+          <div class="chat-menu-wrap">
+            <button type="button" class="chat-three-dot-btn" id="btn-chat-three-dot" aria-label="More options" ${!hasSelectedFriend ? "disabled" : ""}>⋮</button>
+            <div class="chat-three-dot-menu ${hasSelectedFriend && privateChatState.menuOpen ? "" : "hidden"}" id="chat-three-dot-menu">
+              <button type="button" class="chat-menu-item" id="btn-chat-block">${isBlocked ? "Unblock User" : "Block User"}</button>
+              <button type="button" class="chat-menu-item danger" id="btn-chat-report">Report User</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-messages-box" id="chat-messages-box"></div>
+
+        ${hasSelectedFriend ? `
+          <div class="chat-emoji-bar ${privateChatState.emojiBarOpen ? "" : "hidden"}" id="chat-emoji-bar">
+            ${emojis.map((em) => `<button type="button" class="chat-emoji-btn" data-emoji="${escapeRoyalHtml(em)}">${escapeRoyalHtml(em)}</button>`).join("")}
+          </div>
+
+          <div class="chat-composer-row" id="chat-composer-row">
+            <button type="button" class="chat-emoji-toggle-btn" id="btn-chat-emoji-toggle" aria-label="Emojis">😊</button>
+            <input type="text" class="chat-text-input" id="chat-message-input" maxlength="300" placeholder="Write a message..." />
+            <button type="button" class="chat-send-btn" id="btn-chat-send">Send</button>
+          </div>
+        ` : ""}
+      </div>
+    `);
+
+    modalOverlay?.querySelector(".modal-card")?.classList.add("chat-fullscreen-card");
+
+    modalBody?.querySelectorAll(".chat-friend-chip").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        if (window.LudoSound) window.LudoSound.click();
+        privateChatState.selectedPeerUid = chip.dataset.peerUid || "";
+        privateChatState.selectedPeerName = chip.dataset.peerName || "";
+        privateChatState.menuOpen = false;
+        privateChatState.emojiBarOpen = false;
+        openPrivateChatModal();
+      });
+    });
+
+    document.getElementById("btn-chat-three-dot")?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (!privateChatState.selectedPeerUid) return;
+      privateChatState.menuOpen = !privateChatState.menuOpen;
+      document.getElementById("chat-three-dot-menu")?.classList.toggle("hidden", !privateChatState.menuOpen);
+    });
+
+    document.getElementById("btn-chat-block")?.addEventListener("click", async () => {
+      const target = privateChatState.selectedPeerUid;
+      const api = window.LudoTextChat;
+      if (!target || !api) return;
+      privateChatState.menuOpen = false;
+      if (api.isUserBlocked?.(target)) {
+        const res = await api.unblockUser(target);
+        if (res.ok) showToast("User unblocked.");
+      } else {
+        const res = await api.blockUser(target);
+        if (res.ok) showToast("User blocked.");
+      }
+      openPrivateChatModal();
+    });
+
+    document.getElementById("btn-chat-report")?.addEventListener("click", async () => {
+      const target = privateChatState.selectedPeerUid;
+      const api = window.LudoTextChat;
+      if (!target || !api) return;
+      privateChatState.menuOpen = false;
+      const res = await api.reportUser(target, "Reported from private chat");
+      if (res.ok) {
+        showToast("Report submitted.");
+      } else {
+        showToast(res.error || "Unable to submit report.");
+      }
+      document.getElementById("chat-three-dot-menu")?.classList.add("hidden");
+    });
+
+    document.getElementById("btn-chat-emoji-toggle")?.addEventListener("click", () => {
+      privateChatState.emojiBarOpen = !privateChatState.emojiBarOpen;
+      document.getElementById("chat-emoji-bar")?.classList.toggle("hidden", !privateChatState.emojiBarOpen);
+    });
+
+    modalBody?.querySelectorAll(".chat-emoji-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const inp = document.getElementById("chat-message-input");
+        if (!inp) return;
+        inp.value = `${inp.value}${btn.dataset.emoji || ""}`.slice(0, 300);
+        inp.focus();
+      });
+    });
+
+    const handleSendPrivate = async () => {
+      const inp = document.getElementById("chat-message-input");
+      const api = window.LudoTextChat;
+      if (!inp || !api) return;
+      const text = inp.value.trim();
+      if (!text) return;
+      if (!privateChatState.selectedPeerUid) {
+        showToast("Select a friend first.");
+        return;
+      }
+
+      const senderName = window.currentRoyalProfile?.name || document.getElementById("display-name")?.textContent || "Player";
+      const res = await api.sendDirectMessage(text, privateChatState.selectedPeerUid, senderName);
+      if (!res.ok) {
+        showToast(res.error || "Cannot send message.");
+        return;
+      }
+      inp.value = "";
+    };
+
+    document.getElementById("btn-chat-send")?.addEventListener("click", handleSendPrivate);
+    document.getElementById("chat-message-input")?.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        handleSendPrivate();
+      }
+    });
+
+    await mountSelectedFriendChat();
+  }
+
+  function bindPrivateChatRealtimeListeners() {
+    const api = window.LudoTextChat;
+    if (!api) return;
+
+    api.onMessage((msg) => {
+      if (msg?.channel !== "direct") return;
+      const modalVisible = modalOverlay && !modalOverlay.classList.contains("hidden");
+      if (modalVisible && privateChatState.selectedPeerUid) {
+        appendPrivateMessageBubble(msg);
+        if (msg.threadId) {
+          api.clearUnread?.(`dm:${msg.threadId}`);
+        }
+      }
+    });
+
+    api.onPresenceChange((info) => {
+      if (info?.peerUid && info.peerUid === privateChatState.selectedPeerUid) {
+        updatePrivatePresenceUi(info.online);
+      }
+    });
+
+    api.onUnreadChange(({ total }) => {
+      const badge = document.getElementById("chat-unread-badge");
+      if (!badge) return;
+      const count = Number(total) || 0;
+      if (count > 0) {
+        badge.textContent = count > 99 ? "99+" : String(count);
+        badge.classList.remove("hidden");
+      } else {
+        badge.textContent = "0";
+        badge.classList.add("hidden");
+      }
+    });
+  }
+
+  bindPrivateChatRealtimeListeners();
 
   // =========================================================
   // PART 3: ROYAL MUSIC & SOUND EFFECTS SETTINGS MODAL
@@ -1048,7 +1307,7 @@ function escapeRoyalHtml(value) {
     const bgmSlider = document.getElementById("slider-bgm-vol");
     const sfxSlider = document.getElementById("slider-sfx-vol");
 
-    bgmBtn.addEventListener("click", () => {
+    bgmBtn?.addEventListener("click", () => {
       if (!window.LudoSound) return;
       const next = !window.LudoSound.getSettings().musicEnabled;
       window.LudoSound.setMusicEnabled(next);
@@ -1057,7 +1316,7 @@ function escapeRoyalHtml(value) {
       window.LudoSound.click();
     });
 
-    sfxBtn.addEventListener("click", () => {
+    sfxBtn?.addEventListener("click", () => {
       if (!window.LudoSound) return;
       const next = !window.LudoSound.getSettings().sfxEnabled;
       window.LudoSound.setSfxEnabled(next);
@@ -1066,46 +1325,48 @@ function escapeRoyalHtml(value) {
       if (next) window.LudoSound.click();
     });
 
-    bgmSlider.addEventListener("input", (e) => {
+    bgmSlider?.addEventListener("input", (e) => {
       const pct = Number(e.target.value);
-      document.getElementById("label-bgm-vol").textContent = `${pct}%`;
+      const lbl = document.getElementById("label-bgm-vol");
+      if (lbl) lbl.textContent = `${pct}%`;
       if (window.LudoSound) window.LudoSound.setMusicVolume(pct / 100);
     });
 
-    sfxSlider.addEventListener("input", (e) => {
+    sfxSlider?.addEventListener("input", (e) => {
       const pct = Number(e.target.value);
-      document.getElementById("label-sfx-vol").textContent = `${pct}%`;
+      const lbl = document.getElementById("label-sfx-vol");
+      if (lbl) lbl.textContent = `${pct}%`;
       if (window.LudoSound) window.LudoSound.setSfxVolume(pct / 100);
     });
 
-    document.getElementById("btn-test-royal-sound").addEventListener("click", () => {
+    document.getElementById("btn-test-royal-sound")?.addEventListener("click", () => {
       if (window.LudoSound) window.LudoSound.home();
     });
   }
 
-  document.getElementById("btn-play-offline").addEventListener("click", openOfflineSetupModal);
-  document.getElementById("btn-settings").addEventListener("click", openAudioSettingsModal);
-  document.getElementById("btn-ingame-audio").addEventListener("click", openAudioSettingsModal);
+  document.getElementById("btn-play-offline")?.addEventListener("click", openOfflineSetupModal);
+  document.getElementById("btn-settings")?.addEventListener("click", openAudioSettingsModal);
+  document.getElementById("btn-ingame-audio")?.addEventListener("click", openAudioSettingsModal);
 
-  document.getElementById("btn-exit-match").addEventListener("click", () => {
-    if (window.LudoSound) window.LudoSound.click();if (window.LudoTextChat && typeof window.LudoTextChat.unmountRoom === "function") {
-  window.LudoTextChat.unmountRoom();
-}
-
+  document.getElementById("btn-exit-match")?.addEventListener("click", () => {
+    if (window.LudoSound) window.LudoSound.click();
+    if (window.LudoTextChat && typeof window.LudoTextChat.unmountDirectChat === "function") {
+      window.LudoTextChat.unmountDirectChat();
+    }
     exitToLobby();
   });
 
-  document.getElementById("btn-reset-cam").addEventListener("click", () => {
+  document.getElementById("btn-reset-cam")?.addEventListener("click", () => {
     if (window.LudoSound) window.LudoSound.click();
     setLockedBoardCamera();
     positionCornerPods();
     showToast("🎥 3D Board View Locked!");
   });
 
-  document.getElementById("btn-play-online").addEventListener("click", () => {
+  document.getElementById("btn-play-online")?.addEventListener("click", () => {
     if (window.LudoSound) window.LudoSound.click();
     openModal(
-      "🌐 Online Matchmaking",
+      "🌐 LUDO ADDA Online Matchmaking",
       `
       <div class="royal-section-title">SELECT MATCH FORMAT</div>
       <div class="pro-match-grid" id="online-mode-select">
@@ -1130,7 +1391,7 @@ function escapeRoyalHtml(value) {
     );
 
     let selectedOnlineMode = "online-2p";
-    modalBody.querySelectorAll("#online-mode-select .pro-format-card").forEach((btn) => {
+    modalBody?.querySelectorAll("#online-mode-select .pro-format-card").forEach((btn) => {
       btn.addEventListener("click", () => {
         if (window.LudoSound) window.LudoSound.click();
         modalBody.querySelectorAll("#online-mode-select .pro-format-card").forEach((b) => {
@@ -1178,175 +1439,6 @@ function escapeRoyalHtml(value) {
         const cancelBtn = document.getElementById("btn-cancel-matchmaking");
         const statusEl = document.getElementById("pro-search-status-text");
 
-        const closeCurrentModal = () => {
-          if (typeof closeModal === "function") {
-            closeModal(false);
-          } else {
-            clearMatchFoundCountdown();
-            const activeModal = document.querySelector(".modal.active, .royal-modal.active, #modal-overlay.active");
-            if (activeModal) activeModal.classList.remove("active");
-          }
-        };
-
-        if (cancelBtn) {
-          cancelBtn.addEventListener("click", async () => {
-            if (isMatchFound) return;
-            isCancelled = true;
-            if (window.LudoSound) window.LudoSound.click();
-            if (statusEl) statusEl.textContent = "Cancelling search...";
-            if (window.LudoOnlineRoom) {
-              if (typeof window.LudoOnlineRoom.cancelMatchmaking === "function") {
-                await window.LudoOnlineRoom.cancelMatchmaking().catch(() => {});
-              } else if (typeof window.LudoOnlineRoom.leaveOnlineRoom === "function") {
-                await window.LudoOnlineRoom.leaveOnlineRoom().catch(() => {});
-              }
-            }
-            closeCurrentModal();
-            showToast("Matchmaking cancelled.");
-          });
-        }
-  function showMatchFoundScreen(matchData, modeLabel, selectedMode, onComplete) {
-    clearMatchFoundCountdown();
-
-    const maxPlayers = matchData?.maxPlayers === 4 || selectedMode === "online-4p" ? 4 : 2;
-    const rawPlayers = Array.isArray(matchData?.matchedPlayers)
-      ? matchData.matchedPlayers
-      : Object.values(matchData?.players || {}).filter((p) => p && p.uid);
-    let players = rawPlayers.slice(0, maxPlayers);
-
-    if (players.length < maxPlayers) return;
-
-    const totalSeconds = 5;
-    let secondsLeft = totalSeconds;
-
-    const modalHeader = document.querySelector(".modal-header, .royal-modal-header, #modal-header");
-    const closeBtn = document.getElementById("btn-close-modal");
-    if (modalHeader) modalHeader.style.display = "none";
-    if (closeBtn) closeBtn.style.display = "none";
-
-    const buildArenaMarkup = (list) => {
-      if (maxPlayers === 4) {
-        const topTwo = list.slice(0, 2);
-        const bottomTwo = list.slice(2, 4);
-        return `
-          <div class="mf-arena-4p">
-            <div class="mf-grid-4p">
-              ${topTwo.map((p, idx) => renderMatchFoundPlayerCard(p, idx, 4)).join("")}
-            </div>
-            <div class="mf-vs-badge" aria-label="VS">VS</div>
-            <div class="mf-grid-4p">
-              ${bottomTwo.map((p, idx) => renderMatchFoundPlayerCard(p, idx + 2, 4)).join("")}
-            </div>
-          </div>
-        `;
-      }
-
-      return `
-        <div class="mf-arena-2p">
-          ${renderMatchFoundPlayerCard(list[0], 0, 2)}
-          <div class="mf-vs-badge" aria-label="VS">VS</div>
-          ${renderMatchFoundPlayerCard(list[1], 1, 2)}
-        </div>
-      `;
-    };
-
-    const triggerStartMatch = async () => {
-      if (matchFoundHasStarted) return;
-      matchFoundHasStarted = true;
-      if (matchFoundCountdownTimer) {
-        clearInterval(matchFoundCountdownTimer);
-        matchFoundCountdownTimer = null;
-      }
-      if (typeof matchFoundUnsubscribe === "function") {
-        matchFoundUnsubscribe();
-        matchFoundUnsubscribe = null;
-      }
-      if (modalHeader) modalHeader.style.display = "";
-      if (closeBtn) closeBtn.style.display = "";
-
-      if (matchData?.roomId && window.LudoOnlineRoom && typeof window.LudoOnlineRoom.startOnlineRoomMatch === "function") {
-        await window.LudoOnlineRoom.startOnlineRoomMatch(matchData.roomId).catch(() => {});
-      }
-const activeUid =
-  typeof currentUid === "string" && currentUid
-    ? currentUid
-    : (window.auth?.currentUser?.uid || "");
-
-if (window.LudoTextChat && matchData?.roomId && activeUid) {
-  window.LudoTextChat.mountRoom(matchData.roomId, activeUid);
-}
-      
-      if (typeof onComplete === "function") {
-        onComplete({
-          ...matchData,
-          maxPlayers,
-          matchedPlayers: players
-        });
-      }
-    };
-
-    const updateTimerUi = () => {
-      const clamped = Math.max(0, secondsLeft);
-      const timerEl = document.getElementById("mf-countdown-value");
-      const barEl = document.getElementById("mf-countdown-bar");
-      if (timerEl) timerEl.textContent = `${clamped}s`;
-      if (barEl) {
-        const pct = Math.max(0, Math.min(100, (clamped / totalSeconds) * 100));
-        barEl.style.width = `${pct}%`;
-      }
-    };
-
-    const renderScreen = () => {
-      openModal(
-        "",
-        `
-        <div class="match-found-screen" id="match-found-screen">
-          <h2 class="mf-banner-title">MATCH FOUND!</h2>
-          <div class="mf-mode-badge">${escapeRoyalHtml(modeLabel || (maxPlayers === 4 ? "ONLINE 4P LIVE" : "ONLINE 2P LIVE"))}</div>
-          ${buildArenaMarkup(players)}
-          <div class="mf-countdown-box">
-            <div class="mf-countdown-label" id="mf-countdown-label">MATCH STARTING IN</div>
-            <div class="mf-countdown-value" id="mf-countdown-value">${Math.max(0, secondsLeft)}s</div>
-            <div class="mf-countdown-track" aria-hidden="true">
-              <div class="mf-countdown-bar" id="mf-countdown-bar"></div>
-            </div>
-          </div>
-        </div>
-        `
-      );
-      updateTimerUi();
-    };
-
-    renderScreen();
-
-    matchFoundCountdownTimer = setInterval(() => {
-      secondsLeft -= 1;
-      updateTimerUi();
-      if (secondsLeft <= 0) {
-        triggerStartMatch();
-      }
-    }, 1000);
-
-    if (matchData?.roomId && window.LudoOnlineRoom && typeof window.LudoOnlineRoom.subscribeToRoom === "function") {
-      matchFoundUnsubscribe = window.LudoOnlineRoom.subscribeToRoom(matchData.roomId, (roomState) => {
-        if (matchFoundHasStarted || !roomState) return;
-        const updatedList = Array.isArray(roomState.matchedPlayers)
-          ? roomState.matchedPlayers.slice(0, maxPlayers)
-          : Object.values(roomState.players || {}).filter((p) => p && p.uid).slice(0, maxPlayers);
-
-        if (updatedList.length >= maxPlayers) {
-          players = updatedList;
-          renderScreen();
-        }
-
-        if (roomState.status === "playing") {
-          triggerStartMatch();
-        }
-      });
-    }
-  }
-
-                                
         const handleRealMatchFound = (matchData) => {
           if (isCancelled || isMatchFound) return;
           const playersList = Array.isArray(matchData?.matchedPlayers)
@@ -1366,7 +1458,7 @@ if (window.LudoTextChat && matchData?.roomId && activeUid) {
             selectedOnlineMode,
             (confirmedMatch) => {
               if (isCancelled) return;
-              closeCurrentModal();
+              closeModal(false);
               enter3DBoard(label, {
                 mode: selectedOnlineMode,
                 roomId: confirmedMatch?.roomId || null,
@@ -1376,6 +1468,24 @@ if (window.LudoTextChat && matchData?.roomId && activeUid) {
             }
           );
         };
+
+        if (cancelBtn) {
+          cancelBtn.addEventListener("click", async () => {
+            if (isMatchFound) return;
+            isCancelled = true;
+            if (window.LudoSound) window.LudoSound.click();
+            if (statusEl) statusEl.textContent = "Cancelling search...";
+            if (window.LudoOnlineRoom) {
+              if (typeof window.LudoOnlineRoom.cancelMatchmaking === "function") {
+                await window.LudoOnlineRoom.cancelMatchmaking().catch(() => {});
+              } else if (typeof window.LudoOnlineRoom.leaveOnlineRoom === "function") {
+                await window.LudoOnlineRoom.leaveOnlineRoom().catch(() => {});
+              }
+            }
+            closeModal(false);
+            showToast("Matchmaking cancelled.");
+          });
+        }
 
         try {
           if (window.LudoOnlineRoom && typeof window.LudoOnlineRoom.findOnlineMatch === "function") {
@@ -1406,25 +1516,68 @@ if (window.LudoTextChat && matchData?.roomId && activeUid) {
     }
   });
 
-  document.getElementById("btn-private-room").addEventListener("click", () => {
-    openModal("🏰 Private Royal Room", `
+  document.getElementById("btn-private-room")?.addEventListener("click", () => {
+    openModal("🏰 Private LUDO ADDA Room", `
       <p style="color:#cbd5e1;font-size:0.85rem;line-height:1.5;">
-        6-Digit Room Code & Live WebRTC Voice Chat unlock in <b>Phase 2 & 3</b>.
+        Create or join a Private Room with a Room Code, play with friends, and use in-room mic voice chat.
       </p>
     `);
   });
 
-  document.getElementById("btn-daily").addEventListener("click", () => {
-    if (window.LudoSound) window.LudoSound.home();
-    showToast("🎁 Daily us: +200 Coins Claimed!");
+  document.getElementById("btn-voice-room")?.addEventListener("click", () => {
+    openModal("🎙️ Public Gaming Voice Room", `
+      <p style="color:#cbd5e1;font-size:0.85rem;line-height:1.5;">
+        Join gaming voice rooms to talk mic-to-mic with players about Ludo and gaming. Phone calls are not part of LUDO ADDA.
+      </p>
+    `);
   });
 
-  ["btn-quests", "btn-friends", "btn-alerts", "btn-leaderboard", "btn-skins", "btn-vip", "btn-history", "btn-profile"].forEach((id) => {
+  document.getElementById("nav-home")?.addEventListener("click", () => {
+    if (window.LudoSound) window.LudoSound.click();
+    closeModal(false);
+    showToast("🏠 LUDO ADDA Home");
+  });
+
+  document.getElementById("nav-game-rooms")?.addEventListener("click", () => {
+    if (window.LudoSound) window.LudoSound.click();
+    openModal("🎮 Game Rooms", `
+      <div class="setup-options">
+        <button type="button" class="setup-btn" id="quick-open-offline">🎲 Offline Ludo & AI</button>
+        <button type="button" class="setup-btn" id="quick-open-online">🌐 Online Ludo Matchmaking</button>
+        <button type="button" class="setup-btn" id="quick-open-private">🏰 Private Room (Code + Room Mic)</button>
+        <button type="button" class="setup-btn" id="quick-open-voice">🎙️ Public Gaming Voice Room</button>
+      </div>
+      <div id="earn-rewards-slot"></div>
+    `);
+    document.getElementById("quick-open-offline")?.addEventListener("click", () => openOfflineSetupModal());
+    document.getElementById("quick-open-online")?.addEventListener("click", () => document.getElementById("btn-play-online")?.click());
+    document.getElementById("quick-open-private")?.addEventListener("click", () => document.getElementById("btn-private-room")?.click());
+    document.getElementById("quick-open-voice")?.addEventListener("click", () => document.getElementById("btn-voice-room")?.click());
+
+    const rewardSlot = document.getElementById("earn-rewards-slot");
+    renderEarnRewardsCard(rewardSlot, { completedAds: getCompletedAdsFromProfile() });
+  });
+
+  document.getElementById("btn-events")?.addEventListener("click", () => {
+    if (window.LudoSound) window.LudoSound.click();
+    openModal("🏆 LUDO ADDA Events", `
+      <p style="color:#cbd5e1;font-size:0.85rem;line-height:1.5;">
+        Seasonal Ludo challenges and gaming room events will appear here as live event data is connected.
+      </p>
+    `);
+  });
+
+  document.getElementById("nav-chats")?.addEventListener("click", () => {
+    if (window.LudoSound) window.LudoSound.click();
+    openPrivateChatModal();
+  });
+
+  ["btn-daily", "btn-quests", "btn-alerts", "nav-friends"].forEach((id) => {
     const el = document.getElementById(id);
     if (el) {
       el.addEventListener("click", () => {
         if (window.LudoSound) window.LudoSound.click();
-        showToast("👑 Royal Feature Ready!");
+        showToast("👑 LUDO ADDA Ready!");
       });
     }
   });
@@ -1447,12 +1600,14 @@ if (window.LudoTextChat && matchData?.roomId && activeUid) {
     const t = clock.getElapsedTime();
 
     if (!isBoardActive) {
+      heroDiceGroup.position.y = 0.85 + Math.sin(t * 2.4) * 0.18;
       lobbyDice.rotation.x = t * 0.6;
       lobbyDice.rotation.y = t * 0.9;
-      lobbyRing.rotation.z = t * 0.3;
+      innerFrame.rotation.x = -t * 0.45;
+      innerFrame.rotation.y = -t * 0.7;
+      lobbyRing.rotation.z = t * 0.35;
+      lobbyAura.rotation.z = -t * 0.25;
     } else {
-      setLockedBoardCamera();
-      positionCornerPods();
       updateAndRenderCornerDice(now, t);
       if (window.LudoBoard3D && window.LudoBoard3D.animate) {
         window.LudoBoard3D.animate(t);
@@ -1466,8 +1621,171 @@ if (window.LudoTextChat && matchData?.roomId && activeUid) {
   }
   animate();
 
-  if (typeof getActivePlayerProfile === "function" && typeof renderOnlineProfileBanner === "function") {
-    const playerProfile = getActivePlayerProfile();
-    const profileBannerHtml = renderOnlineProfileBanner(playerProfile);
+  // =========================================================
+  // PART 4: EARN REWARDS (GAME ROOMS) - LIVE PROGRESS & SSV BRIDGE
+  // =========================================================
+  const REWARD_MILESTONES = {
+    targetAds: 20,
+    firstMilestoneAds: 10,
+    firstMilestoneCoins: 250,
+    secondMilestoneExtraCoins: 250,
+    secondMilestoneExtraDiamonds: 20
+  };
+
+  let latestRewardData = { completedAds: 0 };
+
+  function getCurrentUserIdSafe() {
+    if (typeof currentUser !== "undefined" && currentUser && currentUser.uid) {
+      return currentUser.uid;
+    }
+    if (window.currentRoyalUser && window.currentRoyalUser.uid) {
+      return window.currentRoyalUser.uid;
+    }
+    if (typeof firebase !== "undefined" && firebase.auth && firebase.auth().currentUser) {
+      return firebase.auth().currentUser.uid;
+    }
+    return "";
   }
+
+  function getCompletedAdsFromProfile() {
+    const profile = window.currentRoyalProfile || {};
+    const fromAdRewards = profile?.adRewards?.completedAds;
+    if (typeof fromAdRewards === "number") return fromAdRewards;
+    if (typeof profile?.completedAds === "number") return profile.completedAds;
+    return Number(latestRewardData?.completedAds) || 0;
+  }
+
+  function createRewardSessionId(uid) {
+    return `${uid}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+  }
+
+  function getRewardStatusText(completedAds) {
+    const count = Number(completedAds) || 0;
+    if (count >= 20) {
+      return "20/20 সম্পন্ন! মোট 500 Coins + 20 Diamonds আনলক হয়েছে।";
+    }
+    if (count >= 10) {
+      return `${count}/20 সম্পন্ন — 250 Coins পাওয়া গেছে। বাকি ${20 - count}টি অ্যাডে আরও 250 Coins + 20 Diamonds পাবেন।`;
+    }
+    return `${count}/20 সম্পন্ন — ${10 - count}টি অ্যাড দেখলেই 250 Coins পাবেন।`;
+  }
+
+  function renderEarnRewardsCard(containerEl, rewardData = {}) {
+    if (!containerEl) return;
+
+    const rawAds =
+      typeof rewardData.completedAds === "number"
+        ? rewardData.completedAds
+        : getCompletedAdsFromProfile();
+
+    latestRewardData = { ...latestRewardData, ...rewardData, completedAds: rawAds };
+
+    const completedAds = Math.min(20, Math.max(0, Number(rawAds) || 0));
+    const progressPercent = Math.round((completedAds / REWARD_MILESTONES.targetAds) * 100);
+    const milestone1Done = completedAds >= 10;
+    const milestone2Done = completedAds >= 20;
+
+    containerEl.innerHTML = `
+      <div id="earn-rewards-card" class="earn-rewards-box" style="padding:14px;border-radius:12px;background:#1b2234;color:#fff;margin-top:12px;border:1px solid rgba(250,204,21,0.35);">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+          <strong>Earn Rewards</strong>
+          <span id="reward-progress-count" style="color:#fde047;font-weight:800;">${completedAds} / 20 Ads</span>
+        </div>
+
+        <div style="width:100%;height:8px;background:#2f3a56;border-radius:999px;overflow:hidden;margin:10px 0;">
+          <div id="reward-progress-bar" style="width:${progressPercent}%;height:100%;background:#22c55e;transition:width 0.25s ease;"></div>
+        </div>
+
+        <div style="font-size:13px;line-height:1.5;margin-bottom:10px;">
+          <div>${milestone1Done ? "✅" : "⬜"} 10 Ads = <strong>250 Coins</strong></div>
+          <div>${milestone2Done ? "✅" : "⬜"} 20 Ads = আরও <strong>250 Coins + 20 Diamonds</strong> (মোট <strong>500 Coins + 20 Diamonds</strong>)</div>
+        </div>
+
+        <p id="reward-status-text" style="font-size:12px;color:#cbd5e1;margin:0 0 12px 0;">
+          ${getRewardStatusText(completedAds)}
+        </p>
+
+        <button id="watch-rewarded-ad-btn" type="button" ${milestone2Done ? "disabled" : ""}
+          style="width:100%;padding:10px 14px;border:none;border-radius:8px;font-weight:700;cursor:pointer;background:${milestone2Done ? "#475569" : "#f59e0b"};color:#111827;">
+          ${milestone2Done ? "সব রিওয়ার্ড সম্পন্ন (20/20)" : "Rewarded Ad দেখুন"}
+        </button>
+      </div>
+    `;
+
+    const btn = containerEl.querySelector("#watch-rewarded-ad-btn");
+    if (btn && !milestone2Done) {
+      btn.addEventListener("click", () => handleWatchRewardedAdClick(btn));
+    }
+  }
+
+  function handleWatchRewardedAdClick(buttonEl) {
+    const uid = getCurrentUserIdSafe();
+    const statusEl = document.getElementById("reward-status-text");
+
+    if (!uid) {
+      if (statusEl) statusEl.textContent = "রিওয়ার্ড পেতে আগে অ্যাকাউন্টে লগইন বা গেস্ট আইডি তৈরি করুন।";
+      return;
+    }
+
+    if (!window.LudoAdBridge || typeof window.LudoAdBridge.showRewardedAd !== "function") {
+      if (statusEl) statusEl.textContent = "Rewarded Ad শুধু Android অ্যাপের ভেতরে কাজ করবে।";
+      return;
+    }
+
+    const sessionId = createRewardSessionId(uid);
+    if (buttonEl) buttonEl.disabled = true;
+    if (statusEl) statusEl.textContent = "বিজ্ঞাপন লোড হচ্ছে...";
+
+    try {
+      window.LudoAdBridge.showRewardedAd(uid, sessionId);
+    } catch (err) {
+      if (buttonEl) buttonEl.disabled = false;
+      if (statusEl) statusEl.textContent = "বিজ্ঞাপন চালু করা যায়নি, আবার চেষ্টা করুন।";
+    }
+  }
+
+  window.renderEarnRewardsCard = renderEarnRewardsCard;
+
+  window.addEventListener("ludo-profile-updated", () => {
+    const slot = document.getElementById("earn-rewards-slot");
+    if (slot) {
+      renderEarnRewardsCard(slot, { completedAds: getCompletedAdsFromProfile() });
+    }
+  });
+
+  // Native WebView Bridge Callbacks
+  window.onNativeRewardedAdStatus = function (status) {
+    const statusEl = document.getElementById("reward-status-text");
+    if (!statusEl) return;
+    if (status === "loading") statusEl.textContent = "Ad লোড হচ্ছে, অনুগ্রহ করে অপেক্ষা করুন...";
+    if (status === "showing") statusEl.textContent = "Ad চলছে...";
+  };
+
+  window.onNativeRewardedAdEarned = function () {
+    const statusEl = document.getElementById("reward-status-text");
+    if (statusEl) {
+      statusEl.textContent = "Ad সম্পন্ন হয়েছে! সার্ভার (SSV) রিওয়ার্ড যাচাই করছে...";
+    }
+  };
+
+  window.onNativeRewardedAdClosed = function (earnedReward) {
+    const btn = document.getElementById("watch-rewarded-ad-btn");
+    const statusEl = document.getElementById("reward-status-text");
+    if (btn) btn.disabled = false;
+
+    if (typeof refreshUserProfileAndRewards === "function") {
+      refreshUserProfileAndRewards();
+    } else if (!earnedReward && statusEl) {
+      statusEl.textContent = "পুরো বিজ্ঞাপন না দেখায় রিওয়ার্ড যোগ হয়নি।";
+    }
+  };
+
+  window.onNativeRewardedAdError = function (message) {
+    const btn = document.getElementById("watch-rewarded-ad-btn");
+    const statusEl = document.getElementById("reward-status-text");
+    if (btn) btn.disabled = false;
+    if (statusEl) {
+      statusEl.textContent = message || "বিজ্ঞাপন দেখানো যায়নি, কিছুক্ষণ পর আবার চেষ্টা করুন।";
+    }
+  };
 })();
