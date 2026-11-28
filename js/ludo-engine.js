@@ -1,4 +1,4 @@
-// js/ludo-engine.js - 4-Corner Glossy 3D Dice Trigger, Player Name Badges & Complete Offline Modes
+// js/ludo-engine.js - LUDO ADDA Offline Engine (2/3/4 Players, AI, Turn, Capture & Podium)
 window.LudoEngine = (function () {
   const MAIN_TRACK = [
     [13,6],[12,6],[11,6],[10,6],[9,6],
@@ -63,14 +63,30 @@ window.LudoEngine = (function () {
   };
 
   let onToast = () => {};
-  let onDiceAnim = () => {}; // callback(color, rolledValue)
+  let onDiceAnim = () => {};
+  let pendingTimers = new Set();
 
-  function init(callbacks) {
+  function scheduleTimer(fn, delay) {
+    const id = setTimeout(() => {
+      pendingTimers.delete(id);
+      fn();
+    }, delay);
+    pendingTimers.add(id);
+    return id;
+  }
+
+  function clearAllTimers() {
+    pendingTimers.forEach((id) => clearTimeout(id));
+    pendingTimers.clear();
+  }
+
+  function init(callbacks = {}) {
     if (callbacks.onToast) onToast = callbacks.onToast;
     if (callbacks.onDiceAnim) onDiceAnim = callbacks.onDiceAnim;
   }
 
   function startMatch(modeOrConfig) {
+    clearAllTimers();
     let slotRoles = { red: "human", green: "ai", yellow: "ai", blue: "ai" };
 
     if (typeof modeOrConfig === "object" && modeOrConfig !== null) {
@@ -157,7 +173,7 @@ window.LudoEngine = (function () {
     updateHUD();
 
     if (state.aiColors.has(currentColor())) {
-      setTimeout(() => rollDice(), 600);
+      scheduleTimer(() => rollDice(currentColor()), 600);
     }
   }
 
@@ -262,7 +278,6 @@ window.LudoEngine = (function () {
     return valid;
   }
 
-  // Only rolls if requestedColor matches current active turn (or called internally)
   function rollDice(requestedColor) {
     if (state.phase !== "ROLL") return;
     const cur = currentColor();
@@ -276,13 +291,13 @@ window.LudoEngine = (function () {
     state.diceValue = rolled;
     onDiceAnim(cur, rolled);
 
-    setTimeout(() => {
+    scheduleTimer(() => {
       const movable = getMovablePawns(cur, rolled);
       state.movablePawns = movable;
 
       if (movable.length === 0) {
         onToast(`${COLOR_BADGES[cur]} rolled ${rolled} — No valid moves!`);
-        setTimeout(() => nextTurn(false), 750);
+        scheduleTimer(() => nextTurn(false), 750);
         return;
       }
 
@@ -291,9 +306,9 @@ window.LudoEngine = (function () {
 
       if (state.aiColors.has(cur)) {
         const chosen = chooseBestAIMove(cur, movable, rolled);
-        setTimeout(() => executeMove(cur, chosen), 420);
+        scheduleTimer(() => executeMove(cur, chosen), 420);
       } else if (movable.length === 1) {
-        setTimeout(() => executeMove(cur, movable[0]), 280);
+        scheduleTimer(() => executeMove(cur, movable[0]), 280);
       }
     }, 450);
   }
@@ -481,7 +496,7 @@ window.LudoEngine = (function () {
       </div>
     `).join("");
 
-    modalTitle.textContent = "👑 ROYAL KINGDOM RESULTS";
+    modalTitle.textContent = "👑 LUDO ADDA ROYAL RESULTS";
     modalBody.innerHTML = `
       <div style="text-align:center;margin-bottom:12px;">
         <div style="font-size:2.4rem;">👑</div>
@@ -489,13 +504,14 @@ window.LudoEngine = (function () {
       </div>
       ${rowsHtml}
       <button class="setup-btn" id="btn-podium-lobby" style="width:100%;margin-top:10px;justify-content:center;background:linear-gradient(135deg,#f59e0b,#d97706);color:#0f172a;font-weight:800;">
-        ← Return to Royal Lobby
+        ← Return to LUDO ADDA Lobby
       </button>
     `;
     modalOverlay.classList.remove("hidden");
     const backBtn = document.getElementById("btn-podium-lobby");
     if (backBtn) {
       backBtn.onclick = () => {
+        clearAllTimers();
         modalOverlay.classList.add("hidden");
         document.getElementById("btn-exit-match")?.click();
       };
@@ -557,13 +573,13 @@ window.LudoEngine = (function () {
           });
           state.phase = "OVER";
           updateHUD();
-          setTimeout(() => showWinnerPodium(), 650);
+          scheduleTimer(() => showWinnerPodium(), 650);
           return;
         }
         bonusTurn = false;
       }
 
-      setTimeout(() => nextTurn(bonusTurn), 260);
+      scheduleTimer(() => nextTurn(bonusTurn), 260);
     };
 
     if (capturedList.length > 0) {
@@ -599,7 +615,7 @@ window.LudoEngine = (function () {
 
     const cur = currentColor();
     if (state.aiColors.has(cur)) {
-      setTimeout(() => rollDice(cur), 520);
+      scheduleTimer(() => rollDice(cur), 520);
     }
   }
 
@@ -610,7 +626,7 @@ window.LudoEngine = (function () {
       const meshes = window.LudoBoard3D.piecesMap[color];
       if (!meshes) return;
       meshes.forEach((mesh, idx) => {
-        if (state.animatingPawns.has(`${color}:${idx}`)) return;
+        if (!mesh || state.animatingPawns.has(`${color}:${idx}`)) return;
         const isHighlighted = state.phase === "MOVE" && color === cur && state.movablePawns.includes(idx);
         if (isHighlighted) {
           const pulse = 1.16 + Math.sin(time * 9) * 0.1;
