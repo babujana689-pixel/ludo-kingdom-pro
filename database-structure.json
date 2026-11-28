@@ -1,0 +1,298 @@
+{
+  "skinCatalog": {
+    "boards": {
+      "classic_ludo": {
+        "id": "classic_ludo",
+        "category": "boards",
+        "tier": "free",
+        "rarity": "Free",
+        "name": "Classic Ludo Board",
+        "priceCoins": 0,
+        "priceDiamonds": 0,
+        "previewSwatches": ["#e62e2d", "#16a34a", "#facc15", "#0ea5e9"],
+        "themeConfig": { "frame": "#111827", "border": "#d4af37", "accent": "#facc15" }
+      },
+      "free_royal_navy": {
+        "id": "free_royal_navy",
+        "category": "boards",
+        "tier": "free",
+        "rarity": "Free",
+        "name": "Royal Navy Free Theme",
+        "priceCoins": 0,
+        "priceDiamonds": 0,
+        "previewSwatches": ["#0b1530", "#1e3a8a", "#facc15", "#38bdf8"],
+        "themeConfig": { "frame": "#091126", "border": "#facc15", "accent": "#38bdf8" }
+      },
+      "free_ivory_court": {
+        "id": "free_ivory_court",
+        "category": "boards",
+        "tier": "free",
+        "rarity": "Free",
+        "name": "Ivory Court Theme",
+        "priceCoins": 0,
+        "priceDiamonds": 0,
+        "previewSwatches": ["#f8fafc", "#334155", "#eab308", "#0284c7"],
+        "themeConfig": { "frame": "#1e293b", "border": "#eab308", "accent": "#fbbf24" }
+      },
+      "emerald_board": {
+        "id": "emerald_board",
+        "category": "boards",
+        "tier": "coins",
+        "rarity": "Coin Rare",
+        "name": "Emerald Board",
+        "priceCoins": 2000,
+        "priceDiamonds": 0,
+        "previewSwatches": ["#064e3b", "#10b981", "#fde047", "#34d399"],
+        "themeConfig": { "frame": "#062e24", "border": "#34d399", "accent": "#10b981" }
+      },
+      "ocean_blue_board": {
+        "id": "ocean_blue_board",
+        "category": "boards",
+        "tier": "coins",
+        "rarity": "Coin Rare",
+        "name": "Ocean Blue Board",
+        "priceCoins": 3000,
+        "priceDiamonds": 0,
+        "previewSwatches": ["#0c4a6e", "#0284c7", "#38bdf8", "#fde047"],
+        "themeConfig": { "frame": "#07263b", "border": "#38bdf8", "accent": "#0ea5e9" }
+      },
+      "sunset_board": {
+        "id": "sunset_board",
+        "category": "boards",
+        "tier": "coins",
+        "rarity": "Coin Epic",
+        "name": "Sunset Board",
+        "priceCoins": 5000,
+        "priceDiamonds": 0,
+        "previewSwatches": ["#7c2d12", "#ea580c", "#facc15", "#fb7185"],
+        "themeConfig": { "frame": "#431407", "border": "#fb923c", "accent": "#facc15" }
+      },
+      "golden_board": {
+        "id": "golden_board",
+        "category": "boards",
+        "tier": "premium",
+        "rarity": "Premium",
+        "name": "Golden Board",
+        "priceCoins": 0,
+        "priceDiamonds": 150,
+        "previewSwatches": ["#422006", "#ca8a04", "#fde047", "#fef9c3"],
+        "themeConfig": { "frame": "#291504", "border": "#fde047", "accent": "#facc15" }
+      },
+      "galaxy_board": {
+        "id": "galaxy_board",
+        "category": "boards",
+        "tier": "premium",
+        "rarity": "Premium",
+        "name": "Galaxy Board",
+        "priceCoins": 0,
+        "priceDiamonds": 300,
+        "previewSwatches": ["#1e1b4b", "#4f46e5", "#c084fc", "#38bdf8"],
+        "themeConfig": { "frame": "#0f0c29", "border": "#a855f7", "accent": "#38bdf8" }
+      },
+      "legendary_royal_board": {
+        "id": "legendary_royal_board",
+        "category": "boards",
+        "tier": "ultra_premium",
+        "rarity": "Ultra Premium",
+        "name": "Legendary Royal Board",
+        "priceCoins": 0,
+        "priceDiamonds": 650,
+        "previewSwatches": ["#090d1e", "#d4af37", "#fef08a", "#e11d48"],
+        "themeConfig": { "frame": "#060914", "border": "#fef08a", "accent": "#facc15" }
+      },
+      "galaxy_animated_board": {
+        "id": "galaxy_animated_board",
+        "category": "boards",
+        "tier": "ultra_premium",
+        "rarity": "Ultra Premium",
+        "name": "Galaxy Animated Board",
+        "priceCoins": 0,
+        "priceDiamonds": 850,
+        "previewSwatches": ["#090d1e", "#7c3aed", "#22d3ee", "#facc15"],
+        "themeConfig": { "frame": "#050714", "border": "#22d3ee", "accent": "#c084fc" }
+      }
+    },
+    "dice": {
+      "classic_dice": {
+        "id": "classic_dice",
+        "category": "dice",
+        "tier": "free",
+        "rarity": "Free",
+        "name": "Classic Dice",
+        "priceCoins": 0,
+        "priceDiamonds": 0,
+        "previewSwatches": ["#f8fafc", "#0f172a", "#facc15"]
+      },
+      "free_mint_dice": {
+        "id": "free_mint_dice",
+        "category": "dice",
+        "tier": "free",
+        "rarity": "Free",
+        "name": "Mint Starter Dice",
+        "priceCoins": 0,
+        "priceDiamonds": 0,
+        "previewSwatches": ["#10b981", "#064e3b", "#fef08a"]
+      },
+      "neon_dice": {
+        "id": "neon_dice",
+        "category": "dice",
+        "tier": "coins",
+        "rarity": "Coin Epic",
+        "name": "Neon Dice",
+        "priceCoins": 4000,
+        "priceDiamonds": 0,
+        "previewSwatches": ["#06b6d4", "#ec4899", "#090d16"]
+      },
+      "diamond_dice": {
+        "id": "diamond_dice",
+        "category": "dice",
+        "tier": "premium",
+        "rarity": "Premium",
+        "name": "Diamond Dice",
+        "priceCoins": 0,
+        "priceDiamonds": 50,
+        "previewSwatches": ["#38bdf8", "#e0f2fe", "#0284c7"]
+      },
+      "animated_dice": {
+        "id": "animated_dice",
+        "category": "dice",
+        "tier": "premium",
+        "rarity": "Premium",
+        "name": "Animated Dice",
+        "priceCoins": 0,
+        "priceDiamonds": 200,
+        "previewSwatches": ["#f59e0b", "#a855f7", "#fef08a"]
+      },
+      "dragon_dice": {
+        "id": "dragon_dice",
+        "category": "dice",
+        "tier": "ultra_premium",
+        "rarity": "Ultra Premium",
+        "name": "Dragon Dice",
+        "priceCoins": 0,
+        "priceDiamonds": 550,
+        "previewSwatches": ["#dc2626", "#facc15", "#18181b"]
+      }
+    },
+    "tokens": {
+      "default_4_colors": {
+        "id": "default_4_colors",
+        "category": "tokens",
+        "tier": "free",
+        "rarity": "Free",
+        "name": "Default 4 Token Colors",
+        "priceCoins": 0,
+        "priceDiamonds": 0,
+        "previewSwatches": ["#e62e2d", "#16a34a", "#facc15", "#0ea5e9"]
+      },
+      "fire_token": {
+        "id": "fire_token",
+        "category": "tokens",
+        "tier": "coins",
+        "rarity": "Coin Epic",
+        "name": "Fire Token",
+        "priceCoins": 6000,
+        "priceDiamonds": 0,
+        "previewSwatches": ["#ef4444", "#f97316", "#fde047"]
+      },
+      "royal_token": {
+        "id": "royal_token",
+        "category": "tokens",
+        "tier": "premium",
+        "rarity": "Premium",
+        "name": "Royal Token",
+        "priceCoins": 0,
+        "priceDiamonds": 100,
+        "previewSwatches": ["#facc15", "#ca8a04", "#1e3a8a"]
+      },
+      "golden_animated_tokens": {
+        "id": "golden_animated_tokens",
+        "category": "tokens",
+        "tier": "ultra_premium",
+        "rarity": "Ultra Premium",
+        "name": "Golden Animated Tokens",
+        "priceCoins": 0,
+        "priceDiamonds": 500,
+        "previewSwatches": ["#fef08a", "#f59e0b", "#78350f"]
+      }
+    },
+    "extras": {
+      "crown_victory_effect": {
+        "id": "crown_victory_effect",
+        "category": "extras",
+        "tier": "ultra_premium",
+        "rarity": "Ultra Premium",
+        "name": "Crown Victory Effect",
+        "priceCoins": 0,
+        "priceDiamonds": 450,
+        "previewSwatches": ["#fde047", "#f59e0b", "#0ea5e9"]
+      },
+      "special_premium_avatar": {
+        "id": "special_premium_avatar",
+        "category": "extras",
+        "tier": "ultra_premium",
+        "rarity": "Ultra Premium",
+        "name": "Special Premium Player Avatar",
+        "priceCoins": 0,
+        "priceDiamonds": 400,
+        "previewSwatches": ["#facc15", "#1e1b4b", "#f43f5e"]
+      }
+    },
+    "customColors": {
+      "free_crimson": { "id": "free_crimson", "tier": "free", "rarity": "Free", "name": "Crimson", "hex": "#ef4444", "priceCoins": 0, "priceDiamonds": 0 },
+      "free_emerald": { "id": "free_emerald", "tier": "free", "rarity": "Free", "name": "Emerald", "hex": "#22c55e", "priceCoins": 0, "priceDiamonds": 0 },
+      "free_gold": { "id": "free_gold", "tier": "free", "rarity": "Free", "name": "Royal Gold", "hex": "#facc15", "priceCoins": 0, "priceDiamonds": 0 },
+      "free_sky": { "id": "free_sky", "tier": "free", "rarity": "Free", "name": "Sky Blue", "hex": "#38bdf8", "priceCoins": 0, "priceDiamonds": 0 },
+      "coin_violet": { "id": "coin_violet", "tier": "coins", "rarity": "Coin Rare", "name": "Royal Violet", "hex": "#a855f7", "priceCoins": 1500, "priceDiamonds": 0 },
+      "coin_coral": { "id": "coin_coral", "tier": "coins", "rarity": "Coin Rare", "name": "Coral Flame", "hex": "#fb7185", "priceCoins": 2500, "priceDiamonds": 0 },
+      "diamond_aurora": { "id": "diamond_aurora", "tier": "premium", "rarity": "Premium", "name": "Aurora Cyan", "hex": "#22d3ee", "priceCoins": 0, "priceDiamonds": 75 },
+      "diamond_rose_gold": { "id": "diamond_rose_gold", "tier": "premium", "rarity": "Premium", "name": "Rose Gold", "hex": "#fbbf24", "priceCoins": 0, "priceDiamonds": 120 }
+    }
+  },
+  "topupPackages": {
+    "pack_29": { "id": "pack_29", "productId": "ludo_adda_diamonds_100", "priceInr": 29, "diamonds": 100, "tag": "Starter" },
+    "pack_59": { "id": "pack_59", "productId": "ludo_adda_diamonds_250", "priceInr": 59, "diamonds": 250, "tag": "Popular" },
+    "pack_99": { "id": "pack_99", "productId": "ludo_adda_diamonds_500", "priceInr": 99, "diamonds": 500, "tag": "Value" },
+    "pack_199": { "id": "pack_199", "productId": "ludo_adda_diamonds_1200", "priceInr": 199, "diamonds": 1200, "tag": "Pro Pack" },
+    "pack_499": { "id": "pack_499", "productId": "ludo_adda_diamonds_3500", "priceInr": 499, "diamonds": 3500, "tag": "Royal Vault" }
+  },
+  "users": {
+    "<uid>": {
+      "coins": 1000,
+      "gems": 25,
+      "ownedSkins": {
+        "classic_ludo": true,
+        "free_royal_navy": true,
+        "free_ivory_court": true,
+        "classic_dice": true,
+        "free_mint_dice": true,
+        "default_4_colors": true,
+        "free_crimson": true,
+        "free_emerald": true,
+        "free_gold": true,
+        "free_sky": true
+      },
+      "equipped": {
+        "board": "classic_ludo",
+        "dice": "classic_dice",
+        "tokens": "default_4_colors",
+        "extras": {
+          "crown_victory_effect": false,
+          "special_premium_avatar": false
+        },
+        "customBoardColor": "free_crimson",
+        "customTokenColor": "free_gold"
+      }
+    }
+  },
+  "verifiedPurchases": {
+    "<uid>": {
+      "<purchaseTokenOrOrderId>": {
+        "productId": "ludo_adda_diamonds_100",
+        "diamondsCredited": 100,
+        "amountInr": 29,
+        "verifiedAt": 1764244740000
+      }
+    }
+  }
+}
